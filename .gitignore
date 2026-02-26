@@ -1,0 +1,13 @@
+.venv
+.env
+
+# Database
+db.sqlite3
+
+
+# Django
+.pytest_cache
+
+# Python
+__pycache__
+
