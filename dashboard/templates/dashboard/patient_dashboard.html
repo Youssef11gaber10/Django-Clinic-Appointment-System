@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +56,38 @@
     }
     .brand-icon svg { width: 18px; height: 18px; fill: var(--accent); }
     .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; }
+
+    /* ── NAV TABS ── */
+    .nav-tabs {
+      display: flex; align-items: center; gap: .25rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+    }
+    .nav-tab {
+      padding: 6px 18px; border-radius: 7px;
+      font-size: .83rem; font-weight: 500;
+      cursor: pointer; border: none; background: transparent;
+      color: var(--muted); font-family: inherit;
+      transition: all .15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .nav-tab .tab-count {
+      background: var(--accent);
+      color: #fff;
+      font-size: .67rem; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px;
+      line-height: 1.4;
+    }
+    .nav-tab.active .tab-count { background: var(--sidebar-bg); }
+
     .nav-right { display: flex; align-items: center; gap: 1rem; }
     .nav-avatar {
       width: 36px; height: 36px; border-radius: 50%;
@@ -71,33 +104,6 @@
 
     /* ── SHELL ── */
     .shell { display: flex; flex: 1; }
-
-    /* ── SIDEBAR ── */
-    .sidebar {
-      width: 228px; flex-shrink: 0;
-      background: var(--sidebar-bg);
-      padding: 1.6rem .9rem;
-      display: flex; flex-direction: column; gap: .2rem;
-      position: sticky; top: var(--nav-h);
-      height: calc(100vh - var(--nav-h));
-      overflow-y: auto;
-    }
-    .sec-label {
-      font-size: .68rem; font-weight: 600; letter-spacing: .13em;
-      text-transform: uppercase; color: #ffffff38;
-      padding: .6rem .8rem .2rem; margin-top: .4rem;
-    }
-    .sidebar a {
-      display: flex; align-items: center; gap: 9px;
-      padding: .62rem .8rem; border-radius: 9px;
-      color: #ffffffb3; text-decoration: none;
-      font-size: .875rem; font-weight: 400;
-      transition: background .14s, color .14s;
-    }
-    .sidebar a:hover { background: var(--sidebar-hover); color: #fff; }
-    .sidebar a.active { background: var(--sidebar-act); color: #fff; font-weight: 500; }
-    .sidebar a.active .si { color: var(--accent); }
-    .si { width: 17px; height: 17px; flex-shrink: 0; }
 
     /* ── MAIN ── */
     .main {
@@ -117,6 +123,10 @@
     .pg-header h1 em { font-style: italic; color: var(--accent); }
     .pg-header p { margin-top: .3rem; color: var(--muted); font-size: .88rem; }
 
+    /* ── TAB PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp .3s ease both; }
+
     /* ── SECTION ── */
     section { margin-bottom: 2.5rem; }
     .sec-head {
@@ -124,65 +134,61 @@
       margin-bottom: 1rem;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .sec-head a {
-      font-family: 'DM Sans', sans-serif; font-size: .8rem;
-      color: var(--accent2); text-decoration: none; font-weight: 500;
-    }
-    .sec-head a:hover { text-decoration: underline; }
 
-    /* ── NEXT APPOINTMENT — FULL WIDTH CARD ── */
-    .next-appt-card {
+    /* ── APPOINTMENT CARD ── */
+    .appt-card {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); box-shadow: var(--shadow);
-      overflow: hidden;
-      width: 100%;
+      overflow: hidden; width: 100%;
+      margin-bottom: 1.25rem;
     }
 
-    /* Coloured top band */
+    /* Dark header band */
     .appt-card-band {
       background: var(--sidebar-bg);
-      padding: 1.4rem 2rem;
+      padding: 1.2rem 1.75rem;
       display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
     }
-    .appt-band-left { display: flex; align-items: center; gap: 1.25rem; }
+    .appt-band-left { display: flex; align-items: center; gap: 1.1rem; }
     .appt-date-badge {
       background: rgba(255,255,255,.08);
       border: 1px solid rgba(255,255,255,.14);
-      border-radius: 12px;
-      padding: .8rem 1.1rem; text-align: center;
-      min-width: 62px; flex-shrink: 0; color: #fff;
+      border-radius: 10px;
+      padding: .65rem 1rem; text-align: center;
+      min-width: 56px; flex-shrink: 0; color: #fff;
     }
     .appt-date-badge .day {
       font-family: 'DM Serif Display', serif;
-      font-size: 2rem; line-height: 1;
+      font-size: 1.7rem; line-height: 1;
     }
     .appt-date-badge .mon {
-      font-size: .67rem; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--accent); margin-top: 3px;
+      font-size: .63rem; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--accent); margin-top: 2px;
     }
     .appt-band-title { color: #fff; }
     .appt-band-title h3 {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.25rem; font-weight: 400;
+      font-size: 1.1rem; font-weight: 400;
     }
-    .appt-band-title p { font-size: .82rem; color: #ffffff80; margin-top: 2px; }
+    .appt-band-title p { font-size: .8rem; color: #ffffff70; margin-top: 2px; }
 
+    /* Status badge */
     .status-badge {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 14px; border-radius: 20px;
-      font-size: .78rem; font-weight: 600; text-transform: capitalize;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: .75rem; font-weight: 600; text-transform: capitalize;
       flex-shrink: 0;
     }
     .s-requested  { background: #fdf3e0; color: #8a5e00; }
     .s-confirmed  { background: #e3f1f7; color: #1a6180; }
     .s-checked_in { background: #e8f5ec; color: #2e7d4f; }
-    .s-completed  { background: #f0f0f0; color: #555; }
+    .s-completed  { background: #eaf5ee; color: #2e7d4f; }
     .s-cancelled  { background: #fde8e8; color: #8a0000; }
     .sbadge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
     /* Card body */
     .appt-card-body {
-      padding: 1.75rem 2rem;
+      padding: 1.5rem 1.75rem;
       display: grid;
       grid-template-columns: auto 1fr auto;
       gap: 2rem;
@@ -190,89 +196,45 @@
     }
 
     /* Doctor column */
-    .doc-col { display: flex; align-items: center; gap: 1rem; min-width: 200px; }
-    .doc-avatar {
-      width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
-      background: linear-gradient(135deg, var(--accent2), #4a7f9b);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: #fff;
-    }
-    .doc-name { font-size: 1rem; font-weight: 600; }
-    .doc-spec { font-size: .8rem; color: var(--muted); margin-top: 2px; }
-    .doc-bio  { font-size: .78rem; color: var(--muted); margin-top: 4px; font-style: italic; }
+    .doc-col { display: flex; align-items: center; gap: .9rem; min-width: 190px; }
 
     /* Details grid */
     .appt-details {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 1.1rem;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1rem;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      padding: 0 2rem;
+      padding: 0 1.75rem;
     }
     .detail-item label {
-      display: block; font-size: .69rem; text-transform: uppercase;
+      display: block; font-size: .67rem; text-transform: uppercase;
       letter-spacing: .09em; color: var(--muted); margin-bottom: 3px;
     }
     .detail-item span {
-      font-size: .9rem; font-weight: 500; color: var(--text);
+      font-size: .88rem; font-weight: 500; color: var(--text);
       display: flex; align-items: center; gap: 5px;
     }
-    .detail-item span svg { width: 14px; height: 14px; fill: var(--accent2); flex-shrink: 0; }
+    .detail-item span svg { width: 13px; height: 13px; fill: var(--accent2); flex-shrink: 0; }
 
     /* Actions column */
-    .appt-actions-col { display: flex; flex-direction: column; gap: .5rem; min-width: 130px; }
+    .appt-actions-col { display: flex; flex-direction: column; gap: .5rem; min-width: 120px; }
     .btn {
-      padding: 8px 18px; border-radius: 8px; font-size: .82rem;
+      padding: 7px 16px; border-radius: 8px; font-size: .8rem;
       font-weight: 500; cursor: pointer; border: none; font-family: inherit;
-      transition: all .14s; text-align: center;
+      transition: all .14s; text-align: center; width: 100%;
     }
-    .btn-dark { background: var(--sidebar-bg); color: #fff; }
-    .btn-dark:hover { background: #2e2e4a; }
+    .btn-dark  { background: var(--sidebar-bg); color: #fff; }
+    .btn-dark:hover  { background: #2e2e4a; }
     .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
     .btn-ghost:hover { background: var(--bg); }
-    .btn-red { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-    .btn-red:hover { background: #fdf0f0; }
-
-    /* ── INSIGHT CARDS ── */
-    .insights-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 1rem;
-      margin-top: 1.25rem;
-    }
-    .insight-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.3rem 1.4rem;
-      box-shadow: var(--shadow);
-      display: flex; flex-direction: column; gap: .4rem;
-      min-height: 110px;
-      position: relative; overflow: hidden;
-      transition: transform .18s, box-shadow .18s;
-    }
-    .insight-card:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(0,0,0,.1); }
-    .insight-lbl {
-      font-size: .71rem; color: var(--muted); font-weight: 600;
-      text-transform: uppercase; letter-spacing: .08em;
-    }
-    .insight-val {
-      font-family: 'DM Serif Display', serif; font-size: 1.9rem;
-      color: var(--text); line-height: 1;
-    }
-    .insight-val.empty { color: var(--border); font-size: 1.5rem; }
-    .insight-sub { font-size: .76rem; color: var(--muted); }
-    /* Subtle corner accent */
-    .insight-card::after {
-      content: ''; position: absolute;
-      bottom: -18px; right: -18px;
-      width: 60px; height: 60px; border-radius: 50%;
-      background: var(--bg);
-    }
+    .btn-red   { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-red:hover   { background: #fdf0f0; }
 
     /* ── EMPTY STATE ── */
     .empty-state {
       background: var(--surface); border: 1px dashed var(--border);
-      border-radius: var(--radius); padding: 2.5rem;
+      border-radius: var(--radius); padding: 3rem 2rem;
       text-align: center; color: var(--muted);
     }
     .empty-state svg { width: 40px; height: 40px; fill: var(--border); display: block; margin: 0 auto .75rem; }
@@ -281,42 +243,28 @@
       display: inline-block; margin-top: .85rem;
       font-size: .83rem; color: var(--accent2); text-decoration: none; font-weight: 500;
     }
-    .empty-state a:hover { text-decoration: underline; }
 
-    /* ── PLACEHOLDER SECTIONS ── */
-    .placeholder-section {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 2rem 1.8rem;
-      box-shadow: var(--shadow); color: var(--muted); font-size: .88rem;
-    }
-    .coming-soon {
-      display: flex; align-items: center; gap: 7px;
-      font-size: .8rem; font-weight: 500; color: var(--accent2);
-    }
-    .coming-soon svg { width: 15px; height: 15px; fill: var(--accent2); flex-shrink: 0; }
-    .placeholder-section p { margin-top: .55rem; font-size: .8rem; }
-    .placeholder-section code {
-      background: var(--bg); padding: 1px 6px; border-radius: 5px;
-      font-size: .78rem; color: var(--text);
-    }
+    /* ── PREVIOUS — dimmed style ── */
+    .appt-card.previous .appt-card-band { background: #3a3a4a; }
+    .appt-card.previous .appt-card-body { opacity: .85; }
 
     @media (max-width: 900px) {
       .appt-card-body { grid-template-columns: 1fr; gap: 1.5rem; }
       .appt-details { border: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
       .appt-actions-col { flex-direction: row; flex-wrap: wrap; }
+      .btn { width: auto; }
     }
-
     @media (max-width: 760px) {
-      .sidebar { display: none; }
       .main { padding: 1.5rem 1.25rem; }
       .topnav { padding: 0 1rem; }
       .pg-header h1 { font-size: 1.5rem; }
+      .nav-tabs { display: none; }
     }
   </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
+<!-- ── TOP NAV ── -->
 <nav class="topnav">
   <a class="brand" href="{% url 'patient_dashboard' %}">
     <div class="brand-icon">
@@ -324,6 +272,19 @@
     </div>
     <span class="brand-name">MediCare</span>
   </a>
+
+  <!-- Tab switcher -->
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('upcoming', this)">
+      Upcoming
+      <span class="tab-count">{{ upcoming_appointments|length }}</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('previous', this)">
+      Previous
+      <span class="tab-count">{{ previous_appointments|length }}</span>
+    </button>
+  </div>
+
   <div class="nav-right">
     <div class="nav-avatar">{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}</div>
     <a class="logout" href="{% url 'logout' %}">Sign out</a>
@@ -331,181 +292,241 @@
 </nav>
 
 <div class="shell">
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <span class="sec-label">Navigation</span>
-
-    <a href="#overview" class="active">
-      <svg class="si" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-      </svg>
-      Overview
-    </a>
-    <a href="#upcoming">
-      <svg class="si" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/>
-      </svg>
-      Upcoming Appointments
-    </a>
-    <a href="#history">
-      <svg class="si" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
-      </svg>
-      History
-    </a>
-    <a href="#records">
-      <svg class="si" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-      </svg>
-      Medical Records
-    </a>
-
-    <span class="sec-label" style="margin-top:auto">Account</span>
-    <a href="#">
-      <svg class="si" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-      </svg>
-      Help & Support
-    </a>
-  </nav>
-
-  <!-- MAIN -->
   <main class="main">
 
     <div class="pg-header">
-      <h1>Good morning, <em>{{ request.user.first_name }}</em> 👋</h1>
+      <h1>Welcome, <em>{{ request.user.first_name }} {{ request.user.last_name }}</em> 👋</h1>
       <p>Here's a summary of your health activity.</p>
     </div>
 
-    <!-- OVERVIEW — NEXT APPOINTMENT + INSIGHTS -->
-    <section id="overview">
-      <div class="sec-head">
-        Next Appointment
-        <a href="#upcoming">View all →</a>
-      </div>
+    <!-- ── UPCOMING TAB ── -->
+    <div id="tab-upcoming" class="tab-panel active">
+      <section>
+        <div class="sec-head">Upcoming Appointments</div>
 
-      {% if next_appointment %}
+        {% if upcoming_appointments %}
+          {% for appt in upcoming_appointments %}
+          <div class="appt-card">
 
-      <!-- ── FULL WIDTH APPOINTMENT CARD ── -->
-      <div class="next-appt-card">
-
-        <!-- Dark header band -->
-        <div class="appt-card-band">
-          <div class="appt-band-left">
-            <div class="appt-date-badge">
-              <div class="day">{{ next_appointment.created_at|slice:"8:10" }}</div>
-              <div class="mon">
-                {% with m=next_appointment.created_at|slice:"5:7" %}
-                  {% if m == "01" %}Jan{% elif m == "02" %}Feb{% elif m == "03" %}Mar
-                  {% elif m == "04" %}Apr{% elif m == "05" %}May{% elif m == "06" %}Jun
-                  {% elif m == "07" %}Jul{% elif m == "08" %}Aug{% elif m == "09" %}Sep
-                  {% elif m == "10" %}Oct{% elif m == "11" %}Nov{% else %}Dec{% endif %}
-                {% endwith %}
+            <!-- Band -->
+            <div class="appt-card-band">
+              <div class="appt-band-left">
+                <div class="appt-date-badge">
+                  <div class="day">{{ appt.created_at|slice:"8:10" }}</div>
+                  <div class="mon">
+                    {% with m=appt.created_at|slice:"5:7" %}
+                      {% if m == "01" %}Jan{% elif m == "02" %}Feb{% elif m == "03" %}Mar
+                      {% elif m == "04" %}Apr{% elif m == "05" %}May{% elif m == "06" %}Jun
+                      {% elif m == "07" %}Jul{% elif m == "08" %}Aug{% elif m == "09" %}Sep
+                      {% elif m == "10" %}Oct{% elif m == "11" %}Nov{% else %}Dec{% endif %}
+                    {% endwith %}
+                  </div>
+                </div>
+                <div class="appt-band-title">
+                  <h3>Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</h3>
+                  <p>{{ appt.doctor.specialization }}</p>
+                </div>
               </div>
+              <span class="status-badge s-{{ appt.status }}">
+                <span class="sbadge-dot"></span>
+                {{ appt.status|title }}
+              </span>
             </div>
-            <div class="appt-band-title">
-              <h3>Dr. {{ next_appointment.doctor.user.first_name }} {{ next_appointment.doctor.user.last_name }}</h3>
-              <p>{{ next_appointment.doctor.specialization }} &nbsp;·&nbsp; {{ next_appointment.created_at|slice:":16" }}</p>
+
+            <!-- Body -->
+            <div class="appt-card-body">
+
+              <!-- Doctor -->
+              <div class="doc-col">
+                <div class="doc-avatar">
+                  <img src="{% static 'images/default_doctor.jpg' %}" width="100px" alt="Doctor" onerror="this.style.display='none'">
+                </div>
+                <div>
+                  <div class="doc-name">Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</div>
+                  <div class="doc-spec">{{ appt.doctor.specialization }}</div>
+                  <div class="doc-bio">{{ appt.doctor.bio }}</div>
+                </div>
+              </div>
+
+              <!-- Details -->
+              <div class="appt-details">
+                <div class="detail-item">
+                  <label>Date</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                    {{ appt.created_at|slice:":10" }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Time</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+                    {{ appt.created_at|slice:"11:16" }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Session Duration</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                    {{ appt.doctor.session_duration }} min
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Status</label>
+                  <span>{{ appt.status|title }}</span>
+                </div>
+                <div class="detail-item">
+                  <label>Doctor Email</label>
+                  <span>{{ appt.doctor.user.email }}</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="appt-actions-col">
+                {% if appt.status == "requested" or appt.status == "confirmed" %}
+                <form action="{% url 'cancel_appointment' appt.id %}" method="POST">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-red">Cancel</button>
+                </form>
+                {% endif %}
+              </div>
+
             </div>
           </div>
-          <span class="status-badge s-{{ next_appointment.status }}">
-            <span class="sbadge-dot"></span>
-            {{ next_appointment.status|title }}
-          </span>
+          {% endfor %}
+
+        {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          <p>You have no upcoming appointments.</p>
+          <a href="#">Book an appointment →</a>
         </div>
+        {% endif %}
 
-        <!-- Card body: doctor / details / actions -->
-        <div class="appt-card-body">
+      </section>
+    </div>
 
-          <!-- Doctor column -->
-          <div class="doc-col">
-            <div class="doc-avatar">{{ next_appointment.doctor.user.first_name|first|upper }}</div>
-            <div>
-              <div class="doc-name">Dr. {{ next_appointment.doctor.user.first_name }} {{ next_appointment.doctor.user.last_name }}</div>
-              <div class="doc-spec">{{ next_appointment.doctor.specialization }}</div>
-              <div class="doc-bio">{{ next_appointment.doctor.bio }}</div>
+    <!-- ── PREVIOUS TAB ── -->
+    <div id="tab-previous" class="tab-panel">
+      <section>
+        <div class="sec-head">Previous Appointments</div>
+
+        {% if previous_appointments %}
+          {% for appt in previous_appointments %}
+          <div class="appt-card previous">
+
+            <!-- Band -->
+            <div class="appt-card-band">
+              <div class="appt-band-left">
+                <div class="appt-date-badge">
+                  <div class="day">{{ appt.created_at|slice:"8:10" }}</div>
+                  <div class="mon">
+                    {% with m=appt.created_at|slice:"5:7" %}
+                      {% if m == "01" %}Jan{% elif m == "02" %}Feb{% elif m == "03" %}Mar
+                      {% elif m == "04" %}Apr{% elif m == "05" %}May{% elif m == "06" %}Jun
+                      {% elif m == "07" %}Jul{% elif m == "08" %}Aug{% elif m == "09" %}Sep
+                      {% elif m == "10" %}Oct{% elif m == "11" %}Nov{% else %}Dec{% endif %}
+                    {% endwith %}
+                  </div>
+                </div>
+                <div class="appt-band-title">
+                  <h3>Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</h3>
+                  <p>{{ appt.doctor.specialization }} </p>
+                </div>
+              </div>
+              <span class="status-badge s-{{ appt.status }}">
+                <span class="sbadge-dot"></span>
+                {{ appt.status|title }}
+              </span>
+            </div>
+
+            <!-- Body -->
+            <div class="appt-card-body">
+
+              <!-- Doctor -->
+              <div class="doc-col">
+                  <img src="{% static 'images/default_doctor.jpg' %}" width="100px" alt="Doctor" onerror="this.style.display='none'">
+                <div>
+                  <div class="doc-name">Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</div>
+                  <div class="doc-spec">{{ appt.doctor.specialization }}</div>
+                  <div class="doc-bio">{{ appt.doctor.bio }}</div>
+                </div>
+              </div>
+
+              <!-- Details -->
+              <div class="appt-details">
+                <div class="detail-item">
+                  <label>Date</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                    {{ appt.created_at|slice:":10" }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Time</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+                    {{ appt.created_at|slice:"11:16" }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Session Duration</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                    {{ appt.doctor.session_duration }} min
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <label>Status</label>
+                  <span>{{ appt.status|title }}</span>
+                </div>
+                {% if appt.check_in_at %}
+                <div class="detail-item">
+                  <label>Checked In</label>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    {{ appt.check_in_at|slice:":16" }}
+                  </span>
+                </div>
+                {% endif %}
+                <div class="detail-item">
+                  <label>Doctor Email</label>
+                  <span>{{ appt.doctor.user.email }}</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="appt-actions-col">
+                <button class="btn btn-dark">View Details</button>
+              </div>
+
             </div>
           </div>
+          {% endfor %}
 
-          <!-- Details grid -->
-          <div class="appt-details">
-            <div class="detail-item">
-              <label>Requested On</label>
-              <span>
-                <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-                {{ next_appointment.created_at|slice:":10" }}
-              </span>
-            </div>
-            <div class="detail-item">
-              <label>Time</label>
-              <span>
-                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
-                {{ next_appointment.created_at|slice:"11:16" }}
-              </span>
-            </div>
-            <div class="detail-item">
-              <label>Session Duration</label>
-              <span>
-                <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-                {{ next_appointment.doctor.session_duration }} minutes
-              </span>
-            </div>
-            <div class="detail-item">
-              <label>Status</label>
-              <span>{{ next_appointment.status|title }}</span>
-            </div>
-            <div class="detail-item">
-              <label>Doctor Email</label>
-              <span>{{ next_appointment.doctor.user.email }}</span>
-            </div>
-            {% if next_appointment.check_in_at %}
-            <div class="detail-item">
-              <label>Checked In At</label>
-              <span>
-                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                {{ next_appointment.check_in_at|slice:":16" }}
-              </span>
-            </div>
-            {% endif %}
-          </div>
-
-          <!-- Actions column -->
-          <div class="appt-actions-col">
-            <button class="btn btn-dark">View Details</button>
-            <button class="btn btn-ghost">Reschedule</button>
-            {% if next_appointment.status != "cancelled" and next_appointment.status != "completed" %}
-            <button class="btn btn-red">Cancel</button>
-            {% endif %}
-          </div>
-
+        {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          <p>No previous appointments found.</p>
         </div>
-      </div>
+        {% endif %}
 
-      {% else %}
-      <div class="empty-state">
-        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-        <p>You have no upcoming appointments.</p>
-        <a href="#">Book an appointment →</a>
-      </div>
-      {% endif %}
+      </section>
+    </div>
 
   </main>
 </div>
 
 <script>
-  const sections = document.querySelectorAll('section[id]');
-  const links    = document.querySelectorAll('.sidebar a[href^="#"]');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        links.forEach(l => l.classList.remove('active'));
-        const a = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
-        if (a) a.classList.add('active');
-      }
-    });
-  }, { rootMargin: '-25% 0px -65% 0px' });
-  sections.forEach(s => obs.observe(s));
+  function switchTab(name, btn) {
+    // hide all panels
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    // deactivate all tab buttons
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    // show selected
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
 </script>
 </body>
 </html>
