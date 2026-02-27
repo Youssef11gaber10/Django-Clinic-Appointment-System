@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate
-from django.contrib.auth import login 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomUserCreationForm
@@ -31,11 +30,16 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
-                return redirect('/accounts/profile/')  # Redirect to profile or dashboard
+                return redirect('/accounts/profile/')  
             else:
                 messages.error(request, f'Invalid credentials for user: {username}')
     
     return render(request, 'registration/login.html', context)
+
+def user_logout(request):
+    logout(request)
+    messages.info(request, 'You have been logged out.')
+    return redirect('login')
 
 @login_required(login_url='login')
 def profile(request):
