@@ -45,15 +45,15 @@ def user_logout(request):
 def forgot_password(request):
     context = {}
     if request.method == 'POST':
-        username = request.POST.get('username', '')
-        new_password = request.POST.get('password', '')    
-        user = User.objects.get(username=username)
-        if user is not None:
+        try:
+            username = request.POST.get('username', '')
+            new_password = request.POST.get('new_password', '')
+            user = User.objects.get(username=username)
             user.set_password(new_password)
             user.save()
             messages.success(request, 'Your password has been reset successfully. You can now log in with your new password.')
             return redirect('login')
-        else:
+        except User.DoesNotExist:
             messages.error(request, f'No account found for username: {username}')
     return render(request, 'registration/forgot_password.html', context)
 
