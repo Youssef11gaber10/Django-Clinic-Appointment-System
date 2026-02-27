@@ -59,7 +59,13 @@ def forgot_password(request):
 
 @login_required(login_url='login')
 def profile(request):
-    return render(request, 'registration/profile.html', {'user': request.user})
+    user = request.user
+    context = {
+        'user': user,
+    }
+    if user.role == 'patient':
+        context['profile'] = user.patient_profile
+    return render(request, 'registration/profile.html', context)
 
 
 # Create your views here.

@@ -21,10 +21,17 @@
     {% endif %}
 
     <h2>Your Profile</h2>
-    <p><strong>Username:</strong> {{ user.username }}</p>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Role:</strong> {{ user.role }}</p>
-    <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+    {% if user.role == 'patient' %}
+        <h3>Patient Details</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+        <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}</p>
+        <p><strong>Gender:</strong> {{ profile.gender }}</p>
+    {% endif %}
 
     <hr>
     <a href="{% url 'logout' %}">Logout</a>
