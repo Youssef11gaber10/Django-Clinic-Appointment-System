@@ -39,15 +39,18 @@
         <p><strong>Gender:</strong> {{ profile.gender }}</p>
     {% endif %}
 
-    {% if user.role == 'patient' %}
-    <a href="{% url 'patient_dashboard' %}">View Your Dashboard</a>
-    {% elif user.role == 'doctor' %}
-    <a href="{% url 'doctor_dashboard' %}">View Your Dashboard</a>
-    {% elif user.role == 'receptionist' %}
-    <a href="{% url 'receptionist_dashboard' %}">View Your Dashboard</a>
-    {% elif user.role == 'admin' %}
-    <a href="{% url 'admin_dashboard' %}">View Your Dashboard</a>
+    {% if user.role == 'doctor' %}
+        <h3>Doctor Details</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+        <p><strong>Specialization:</strong> {{ profile.specialization }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        <p><strong>Session Duration:</strong> {{ profile.session_duration }}</p>
     {% endif %}
+
     <hr />
     <a href="{% url 'logout' %}">Logout</a>
   </body>

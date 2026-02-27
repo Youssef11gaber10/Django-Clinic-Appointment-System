@@ -4,29 +4,11 @@ from .models import UserApp, PatientProfile
 import re
 from datetime import date
 
-class CustomUserCreationForm(UserCreationForm):
-    date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}), required=True)
-    address = forms.CharField(max_length=255, required=True)
-    gender = forms.ChoiceField(choices=[('male', 'Male'), ('female', 'Female')], required=True)
-    
+class BaseUserCreationForm(UserCreationForm):
     class Meta:
         model = UserApp
-        fields = ['username', 'email', 'password1', 'password2', 'phone_number', 'first_name', 'last_name']
+        fields = ['username', 'email', 'password1', 'password2', 'phone_number', 'first_name', 'last_name', 'role']
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.role = 'patient'  
-        if commit:
-            user.save()
-            PatientProfile.objects.create(
-                user=user,
-                date_of_birth=self.cleaned_data.get('date_of_birth'),
-                address=self.cleaned_data.get('address'),
-                gender=self.cleaned_data.get('gender')
-            )
-        return user
-    
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if UserApp.objects.filter(email=email).exists():
@@ -47,17 +29,6 @@ class CustomUserCreationForm(UserCreationForm):
             raise forms.ValidationError("A user with that phone number already exists.")
         return phone_number
     
-    def clean_date_of_birth(self):
-        date_of_birth = self.cleaned_data.get('date_of_birth')
-        if date_of_birth:
-            today = date.today()
-            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-            if date_of_birth > today:
-                raise forms.ValidationError("Date of birth cannot be in the future.")
-            if age > 100:
-                raise forms.ValidationError("Age cannot be more than 100 years.")
-        return date_of_birth
-    
     def clean_first_name(self):
         first_name = self.cleaned_data.get('first_name')
         if first_name and not re.match(r'^[a-zA-Z]+$', first_name):
@@ -73,9 +44,41 @@ class CustomUserCreationForm(UserCreationForm):
         if last_name and len(last_name) < 3:
             raise forms.ValidationError("Last name must be at least 3 characters long.")
         return last_name
+
+
+class PatientUserCreationForm(BaseUserCreationForm):
+    date_of_birth = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}), required=True)
+    address = forms.CharField(max_length=255, required=True)
+    gender = forms.ChoiceField(choices=[('male', 'Male'), ('female', 'Female')], required=True)
+ 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = 'patient'  
+        if commit:
+            user.save()
+            PatientProfile.objects.create(
+                user=user,
+                date_of_birth=self.cleaned_data.get('date_of_birth'),
+                address=self.cleaned_data.get('address'),
+                gender=self.cleaned_data.get('gender')
+            )
+        return user
+    
+    def clean_date_of_birth(self):
+        date_of_birth = self.cleaned_data.get('date_of_birth')
+        if date_of_birth:
+            today = date.today()
+            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+            if date_of_birth > today:
+                raise forms.ValidationError("Date of birth cannot be in the future.")
+            if age > 100:
+                raise forms.ValidationError("Age cannot be more than 100 years.")
+        return date_of_birth
     
     def clean_address(self):
         address = self.cleaned_data.get('address')
         if address and len(address) < 10:
             raise forms.ValidationError("Address must be at least 10 characters long.")
         return address
+    

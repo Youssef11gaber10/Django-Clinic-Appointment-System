@@ -2,28 +2,28 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import CustomUserCreationForm
+from .forms import PatientUserCreationForm, BaseUserCreationForm
 from .models import UserApp as User
 
 def patient_register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = PatientUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Your account has been created successfully. You can now log in.')
             return redirect('login')
     else:
-        form = CustomUserCreationForm()
+        form = PatientUserCreationForm()
     return render(request, 'registration/patient_register.html', {'form': form})
 
 def admin_register(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = BaseUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Account has been created successfully.')
     else:
-        form = CustomUserCreationForm()
+        form = BaseUserCreationForm()
     return render(request, 'registration/admin_register.html', {'form': form})
 
 def user_login(request):
