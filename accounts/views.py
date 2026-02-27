@@ -5,7 +5,7 @@ from django.contrib import messages
 from .forms import CustomUserCreationForm
 from .models import UserApp as User
 
-def register(request):
+def patient_register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -14,7 +14,17 @@ def register(request):
             return redirect('login')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'registration/patient_register.html', {'form': form})
+
+def admin_register(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Account has been created successfully.')
+    else:
+        form = CustomUserCreationForm()
+    return render(request, 'registration/admin_register.html', {'form': form})
 
 def user_login(request):
     context = {}
