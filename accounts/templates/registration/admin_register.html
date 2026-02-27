@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Admin Registration</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .container { max-width: 500px; margin: 0 auto; }
@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-    <h1>Login</h1>
+    <h1>Admin Registration</h1>
 
     {% if messages %}
         <div class="messages">
@@ -45,19 +45,40 @@
         </div>
     {% endif %}
 
+    {% if form.non_field_errors %}
+        <div class="error">
+            <strong>Registration Error:</strong>
+            <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" name="username" required autofocus>
-        </div>
-        <div>
-            <label for="password">Password:</label>
-            <input type="password" name="password" required>
-        </div>
-        <button type="submit">Login</button>
+        
+        {% for field in form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if field.help_text %}
+                    <small>{{ field.help_text|safe }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        
+        <button type="submit">Register</button>
     </form>
-    <p>Don't have an account? <a href="{% url 'patient_register' %}">Register here</a></p>
-    <p>Forgot your password? <a href="{% url 'forgot_password' %}">Reset it here</a></p>
+
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
 </body>
 </html>

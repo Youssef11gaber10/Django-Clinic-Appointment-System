@@ -37,13 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "debug_toolbar",
-    'clinic',
-    'accounts',
-    'scheduling',
-    'appointments',
-    'medical',
-    'dashboard',
+    'accounts.apps.AccountsConfig',
+    'appointments.apps.AppointmentsConfig',
+    'dashboard.apps.DashboardConfig',
+    'medical.apps.MedicalConfig',
+    'scheduling.apps.SchedulingConfig',
 ]
 
 MIDDLEWARE = [
@@ -112,6 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounts.UserApp'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -135,4 +134,6 @@ INTERNAL_IPS = [
     # ...
     "127.0.0.1",
     # ...
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # only if you have global static folder
 ]

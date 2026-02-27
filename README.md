@@ -1,7 +1,7 @@
 
 # Project Structure
 
-The project structure into 5 apps:
+The project structure  is divided into 5 apps:
 
 - `accounts` - User accounts and authentication.
 - `appointments` - Appointments and scheduling.
