@@ -82,3 +82,15 @@ class PatientUserCreationForm(BaseUserCreationForm):
             raise forms.ValidationError("Address must be at least 10 characters long.")
         return address
     
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserApp
+        fields = ['username', 'email', 'phone_number', 'first_name', 'last_name']
+        
+class PatientProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = PatientProfile
+        fields = ['date_of_birth', 'address', 'gender']
+        widgets = {
+            'date_of_birth': forms.DateInput(attrs={'type': 'date'})
+        }

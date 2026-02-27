@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import PatientUserCreationForm, BaseUserCreationForm
+from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm
 from .models import UserApp as User
 
 def patient_register(request):
@@ -76,6 +76,44 @@ def profile(request):
     if user.role == 'patient':
         context['profile'] = user.patient_profile
     return render(request, 'registration/profile.html', context)
+from .models import UserApp as User, PatientProfile
 
+@login_required(login_url='login')
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        if user.role == 'patient':
+            try:
+                patient_profile = PatientProfile.objects.get(user=user)
+                profile_form = PatientProfileUpdateForm(request.POST, instance=patient_profile)
+            except PatientProfile.DoesNotExist:
+                messages.error(request, 'Patient profile not found.')
+                return redirect('profile')
+            
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                messages.success(request, 'Your profile has been updated successfully.')
+                return redirect('profile')
+        else:
+            if user_form.is_valid():
+                user_form.save()
+                messages.success(request, 'Your profile has been updated successfully.')
+                return redirect('profile')
+    else:
+        user_form = UserUpdateForm(instance=user)
+        if user.role == 'patient':
+            try:
+                patient_profile = PatientProfile.objects.get(user=user)
+                profile_form = PatientProfileUpdateForm(instance=patient_profile)
+            except PatientProfile.DoesNotExist:
+                messages.warning(request, 'Patient profile not found.')
+                profile_form = None
+        else:
+            profile_form = None
 
-# Create your views here.
+    return render(request, 'registration/edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
