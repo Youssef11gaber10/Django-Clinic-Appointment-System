@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomUserCreationForm
+from .models import UserApp as User
 
 def register(request):
     if request.method == 'POST':
@@ -40,6 +41,21 @@ def user_logout(request):
     logout(request)
     messages.info(request, 'You have been logged out.')
     return redirect('login')
+
+def forgot_password(request):
+    context = {}
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        new_password = request.POST.get('password', '')    
+        user = User.objects.get(username=username)
+        if user is not None:
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, 'Your password has been reset successfully. You can now log in with your new password.')
+            return redirect('login')
+        else:
+            messages.error(request, f'No account found for username: {username}')
+    return render(request, 'registration/forgot_password.html', context)
 
 @login_required(login_url='login')
 def profile(request):
