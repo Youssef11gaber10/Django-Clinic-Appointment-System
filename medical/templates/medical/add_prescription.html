@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Create Prescription</title>
+</head>
+
+<body>
+    <h2>Create Prescription</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
+    </form>
+    <a href="javascript:history.back()">Back</a>
+</body>
+
+</html>
