@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Profile</title>
+    <style>
+      .success {
+        color: green;
+        font-weight: bold;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome, {{ user.username }}!</h1>
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="message {{ message.tags }}">
+        <strong>{{ message }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2>Your Profile</h2>
+    {% if user.role == 'patient' %}
+        <h3>Patient Details</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+        <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <p><strong>Address:</strong> {{ profile.address }}</p>
+        <p><strong>Gender:</strong> {{ profile.gender }}</p>
+    {% endif %}
+
+    {% if user.role == 'doctor' %}
+        <h3>Doctor Details</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
+        <p><strong>Specialization:</strong> {{ profile.specialization }}</p>
+        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
+        <p><strong>Bio:</strong> {{ profile.bio }}</p>
+        <p><strong>Session Duration:</strong> {{ profile.session_duration }}</p>
+        <p><strong>Session Price:</strong> {{ profile.session_price }}</p>
+    {% endif %}
+
+    <hr />
+    <a href="{% url 'logout' %}">Logout</a>
+    <a href="{% url 'edit_profile' %}">Edit Profile</a>
+    <div class="dashboard-links">
+    {% if user.role == 'patient' %}
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-primary">View Patient Dashboard</a>
+    {% elif user.role == 'doctor' %}
+        <a href="{% url 'doctor_dashboard' %}" class="btn btn-primary">View Doctor Dashboard</a>
+    {% elif user.role == 'admin' %}
+        <a href="{% url 'user_list' %}" class="btn btn-primary">View Users</a>
+    {% endif %}
+</div>
+  </body>
+</html>
