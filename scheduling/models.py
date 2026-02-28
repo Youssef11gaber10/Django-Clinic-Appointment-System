@@ -21,49 +21,6 @@ class Slot(models.Model):
     def __str__(self):
         return f"{self.doctor} | {self.start_time.strftime('%Y-%m-%d %H:%M')}"    
 
-class Appointment(models.Model):
-    class Status(models.TextChoices):
-        REQUESTED = "REQUESTED" , "Requested" 
-        CONFIRMED = "CONFIRMED" , "Confirmed" 
-        CHECK_IN = "CHECK_IN" , "Check_in"
-        COMPLETED = "COMPLETED" , "Completed"
-        CANCELLED = "CANCELLED", "Cancelled" 
-        NO_SHOW = "NO_SHOW" , "No_show"
-
-    status = models.CharField( max_length=50, choices=Status.choices, default = Status.REQUESTED)
-    patient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name = "patient_appointment")
-    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name = "doctor_appointment")
-    slot = models.OneToOneField(Slot, on_delete=models.CASCADE, related_name = "appointment")
-    check_in_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    # buffer_minutes = models.PositiveIntegerField(default=5)
-
-    def __str__(self):
-        return f"{self.patient} - {self.slot.start_time}"
-
-
-class RescheduleHistory(models.Model):
-    old_datetime = models.DateTimeField()
-    new_datetime = models.DateTimeField()
-    changed_by_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="reschedule_history")
-    reason = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name="history")
-
-    def __str__(self):
-        return f"Reschedule on {self.timestamp.strftime('%Y-%m-%d %H:%M')} for {self.appointment}"
-
-# ensure no double booking for the same slot
-@transaction.atomic
-def book_appointment(patient, slot):
-    if slot.is_booked:
-        raise ValueError("This slot is already booked.")
-    
-    appointment = Appointment.objects.create(patient=patient, slot=slot)
-    slot.is_booked = True
-    slot.save()
-    return appointment
-
 class Availability(models.Model):
     class DayOfWeek(models.TextChoices):
         MONDAY = "MONDAY", "Monday"
