@@ -55,5 +55,14 @@
     <hr />
     <a href="{% url 'logout' %}">Logout</a>
     <a href="{% url 'edit_profile' %}">Edit Profile</a>
+    <div class="dashboard-links">
+    {% if user.role == 'patient' %}
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-primary">View Patient Dashboard</a>
+    {% elif user.role == 'doctor' %}
+        <a href="{% url 'doctor_dashboard' %}" class="btn btn-primary">View Doctor Dashboard</a>
+    {% elif user.role == 'admin' %}
+        <a href="{% url 'user_list' %}" class="btn btn-primary">View Users</a>
+    {% endif %}
+</div>
   </body>
 </html>
