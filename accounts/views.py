@@ -138,3 +138,29 @@ def edit_profile(request):
         'user_form': user_form,
         'profile_form': profile_form
     })
+
+def list_users(request):
+    users = User.objects.all()
+    return render(request, 'registration/users_list.html', {'users': users})
+
+def admin_edit_user(request, user_id):
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user)
+        if user_form.is_valid():
+            user_form.save()
+            messages.success(request, f'{user.role.capitalize()} account has been updated successfully.')
+            return redirect('users_list')
+    else:
+        user_form = UserUpdateForm(instance=user)
+    return render(request, 'registration/edit_profile.html', {'user_form': user_form, 'user': user})
+
+def admin_delete_user(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+        username = user.username
+        user.delete()
+        messages.success(request, f'User {username} has been deleted successfully.')
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+    return redirect('users_list')
