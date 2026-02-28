@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Prescription</title>
+</head>
+<body>
+    <h2>Edit Prescription</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update</button>
+    </form>
+    <a href="{% url 'consultation_detail' object.consultation.pk %}">Back</a>
+</body>
+</html>
