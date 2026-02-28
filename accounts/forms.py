@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import UserApp, PatientProfile    
+from .models import UserApp, PatientProfile, DoctorProfile    
 import re
 from datetime import date
 
@@ -41,3 +41,8 @@ class PatientProfileUpdateForm(forms.ModelForm):
         widgets = {
             'date_of_birth': forms.DateInput(attrs={'type': 'date'})
         }
+
+class DoctorProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = DoctorProfile
+        fields = ['specialization', 'bio', 'session_duration', 'session_price']

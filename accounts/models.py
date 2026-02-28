@@ -18,7 +18,8 @@ class DoctorProfile(models.Model):
     user = models.OneToOneField(UserApp, on_delete=models.CASCADE, related_name='doctor_profile')
     specialization = models.CharField(max_length=100)
     bio = models.TextField(blank=True, null=True)
-    session_duration = models.IntegerField(default=30)  
+    session_duration = models.IntegerField(default=30) 
+    session_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00) 
     def __str__(self):
         return f"{self.user.username} - {self.specialization}"
     

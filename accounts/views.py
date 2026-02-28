@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm
-from .models import UserApp as User
+from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm, DoctorProfileUpdateForm 
+from .models import UserApp as User, PatientProfile, DoctorProfile
 
 def patient_register(request):
     if request.method == 'POST':
@@ -20,8 +20,14 @@ def admin_register(request):
     if request.method == 'POST':
         form = BaseUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Account has been created successfully.')
+            user = form.save(commit=False)
+            user.save()
+            if user.role == 'patient':
+                PatientProfile.objects.create(user=user)
+            elif user.role == 'doctor':
+                DoctorProfile.objects.create(user=user)
+            messages.success(request, f'{user.role.capitalize()} account has been created successfully.')
+            return redirect('login')
     else:
         form = BaseUserCreationForm()
     return render(request, 'registration/admin_register.html', {'form': form})
@@ -74,9 +80,16 @@ def profile(request):
         'user': user,
     }
     if user.role == 'patient':
-        context['profile'] = user.patient_profile
+        try:
+         context['profile'] = user.patient_profile
+        except PatientProfile.DoesNotExist:
+            messages.error(request, 'Patient profile not found.')
+    if user.role == 'doctor':
+        try:
+            context['profile'] = user.doctor_profile
+        except DoctorProfile.DoesNotExist:
+            messages.error(request, 'Doctor profile not found.')
     return render(request, 'registration/profile.html', context)
-from .models import UserApp as User, PatientProfile
 
 @login_required(login_url='login')
 def edit_profile(request):
@@ -90,17 +103,18 @@ def edit_profile(request):
             except PatientProfile.DoesNotExist:
                 messages.error(request, 'Patient profile not found.')
                 return redirect('profile')
-            
-            if user_form.is_valid() and profile_form.is_valid():
-                user_form.save()
-                profile_form.save()
-                messages.success(request, 'Your profile has been updated successfully.')
+        elif user.role == 'doctor':
+            try:
+                doctor_profile = DoctorProfile.objects.get(user=user)
+                profile_form = DoctorProfileUpdateForm(request.POST, instance=doctor_profile)
+            except DoctorProfile.DoesNotExist:
+                messages.error(request, 'Doctor profile not found.')
                 return redirect('profile')
-        else:
-            if user_form.is_valid():
-                user_form.save()
-                messages.success(request, 'Your profile has been updated successfully.')
-                return redirect('profile')
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Your profile has been updated successfully.')
+            return redirect('profile')
     else:
         user_form = UserUpdateForm(instance=user)
         if user.role == 'patient':
@@ -109,6 +123,13 @@ def edit_profile(request):
                 profile_form = PatientProfileUpdateForm(instance=patient_profile)
             except PatientProfile.DoesNotExist:
                 messages.warning(request, 'Patient profile not found.')
+                profile_form = None
+        elif user.role == 'doctor':
+            try:
+                doctor_profile = DoctorProfile.objects.get(user=user)
+                profile_form = DoctorProfileUpdateForm(instance=doctor_profile)
+            except DoctorProfile.DoesNotExist:
+                messages.warning(request, 'Doctor profile not found.')
                 profile_form = None
         else:
             profile_form = None
