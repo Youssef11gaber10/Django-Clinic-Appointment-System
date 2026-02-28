@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 # from .models import Appointment, DoctorProfile
 
 # ── Dummy Data ────────────────────────────────────────────────────────────────
@@ -83,7 +84,9 @@ def get_doctorprofile(doctor_id):
 
 # ── Views ─────────────────────────────────────────────────────────────────────
 
-def patient_dashboard_overview(request):
+
+@login_required(login_url="login")
+def patient_dashboard(request):
 
     active_statuses   = {"requested", "confirmed"}
     previous_statuses = {"completed"}

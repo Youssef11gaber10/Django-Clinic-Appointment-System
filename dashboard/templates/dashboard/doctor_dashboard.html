@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard · MediCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f5f3ef;
+      --surface:     #ffffff;
+      --sidebar-bg:  #1a1a2e;
+      --accent:      #c8a97e;
+      --accent2:     #6a9fb5;
+      --text:        #1c1c1c;
+      --muted:       #7a7a7a;
+      --border:      #e5e2da;
+      --success:     #6abf8a;
+      --danger:      #e07070;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(0,0,0,.07);
+      --nav-h:       64px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      font-size: 15px; line-height: 1.55;
+    }
+
+    /* ── TOP NAV ── */
+    .topnav {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem;
+      box-shadow: 0 1px 8px rgba(0,0,0,.04);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+    .brand-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--sidebar-bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .brand-icon svg { width: 18px; height: 18px; fill: var(--accent); }
+    .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; }
+
+    .nav-tabs {
+      display: flex; align-items: center; gap: .25rem;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 3px;
+    }
+    .nav-tab {
+      padding: 6px 18px; border-radius: 7px;
+      font-size: .83rem; font-weight: 500;
+      cursor: pointer; border: none; background: transparent;
+      color: var(--muted); font-family: inherit;
+      transition: all .15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .tab-count {
+      background: var(--accent); color: #fff;
+      font-size: .67rem; font-weight: 700;
+      padding: 1px 6px; border-radius: 10px; line-height: 1.4;
+    }
+    .nav-tab.active .tab-count { background: var(--sidebar-bg); }
+
+    .nav-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: .82rem; color: #fff;
+    }
+    .logout {
+      font-size: .83rem; color: var(--muted); text-decoration: none;
+      padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
+      transition: all .18s;
+    }
+    .logout:hover { background: var(--bg); color: var(--text); }
+
+    /* ── SHELL / MAIN ── */
+    .shell { display: flex; flex: 1; }
+    .main {
+      flex: 1; padding: 2.5rem 2.5rem 4rem; min-width: 0;
+      animation: fadeUp .42s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .pg-header { margin-bottom: 2rem; }
+    .pg-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1.2; font-weight: 400; }
+    .pg-header h1 em { font-style: italic; color: var(--accent); }
+    .pg-header p { margin-top: .3rem; color: var(--muted); font-size: .88rem; }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 14px; margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.2rem 1.4rem;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
+    .stat-card.c-blue::after   { background: var(--accent2); }
+    .stat-card.c-green::after  { background: var(--success); }
+    .stat-card.c-gold::after   { background: var(--accent); }
+    .stat-card.c-red::after    { background: var(--danger); }
+    .stat-label { font-size: .7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2.4rem; line-height: 1; margin-top: 4px; }
+    .stat-sub   { font-size: .75rem; color: var(--muted); margin-top: 3px; }
+
+    /* ── TAB PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeUp .3s ease both; }
+
+    section { margin-bottom: 2.5rem; }
+    .sec-head {
+      font-family: 'DM Serif Display', serif; font-size: 1.22rem; font-weight: 400;
+      margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sec-head span { font-family: 'DM Sans', sans-serif; font-size: .78rem; color: var(--muted); font-weight: 400; }
+
+    /* ── APPOINTMENT CARD ── */
+    .appt-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow);
+      overflow: hidden; width: 100%; margin-bottom: 1.25rem;
+    }
+
+    .appt-card-band {
+      background: var(--sidebar-bg);
+      padding: 1.2rem 1.75rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .appt-band-left { display: flex; align-items: center; gap: 1.1rem; }
+
+    .appt-date-badge {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 10px; padding: .65rem 1rem;
+      text-align: center; min-width: 56px; flex-shrink: 0; color: #fff;
+    }
+    .appt-date-badge .day { font-family: 'DM Serif Display', serif; font-size: 1.7rem; line-height: 1; }
+    .appt-date-badge .mon { font-size: .63rem; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); margin-top: 2px; }
+
+    .appt-band-title { color: #fff; }
+    .appt-band-title h3 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; font-weight: 400; }
+    .appt-band-title p  { font-size: .8rem; color: #ffffff70; margin-top: 2px; }
+
+    .band-right { display: flex; align-items: center; gap: .75rem; }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: .75rem; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .sbadge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .s-requested  { background: #fdf3e0; color: #8a5e00; }
+    .s-confirmed  { background: #e3f1f7; color: #1a6180; }
+    .s-checked_in { background: #e8f5ec; color: #2e7d4f; }
+    .s-completed  { background: #eaf5ee; color: #2e7d4f; }
+    .s-cancelled  { background: #fde8e8; color: #8a0000; }
+    .s-no_show    { background: #f5e8e8; color: #7a2020; }
+
+    /* Wait pill */
+    .wait-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .7rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .wait-long   { background: #fde8e8; color: #8a0000; }
+    .wait-medium { background: #fdf3e0; color: #8a5e00; }
+    .wait-short  { background: #e8f5ec; color: #2e7d4f; }
+
+    /* Card body */
+    .appt-card-body {
+      padding: 1.5rem 1.75rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 2rem; align-items: start;
+    }
+
+    /* Patient col */
+    .pat-col { display: flex; align-items: center; gap: .9rem; min-width: 180px; }
+    .pat-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: #fff; flex-shrink: 0;
+    }
+    .pat-name { font-weight: 600; font-size: .95rem; }
+    .pat-meta { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* Details */
+    .appt-details {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+      gap: 1rem;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      padding: 0 1.75rem;
+    }
+    .detail-item label {
+      display: block; font-size: .67rem; text-transform: uppercase;
+      letter-spacing: .09em; color: var(--muted); margin-bottom: 3px;
+    }
+    .detail-item span {
+      font-size: .88rem; font-weight: 500; color: var(--text);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .detail-item span svg { width: 13px; height: 13px; fill: var(--accent2); flex-shrink: 0; }
+
+    /* Actions */
+    .appt-actions-col { display: flex; flex-direction: column; gap: .5rem; min-width: 130px; }
+    .btn {
+      padding: 7px 16px; border-radius: 8px; font-size: .8rem;
+      font-weight: 500; cursor: pointer; border: none; font-family: inherit;
+      transition: all .14s; text-align: center; width: 100%;
+    }
+    .btn-dark  { background: var(--sidebar-bg); color: #fff; }
+    .btn-dark:hover  { background: #2e2e4a; }
+    .btn-green { background: #e8f5ec; color: #2e7d4f; border: 1px solid #b8dfc5; }
+    .btn-green:hover { background: #d0edda; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost:hover { background: var(--bg); }
+    .btn-red   { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+    .btn-red:hover   { background: #fdf0f0; }
+
+    /* dimmed completed */
+    .appt-card.dimmed .appt-card-band { background: #3a3a4a; }
+    .appt-card.dimmed .appt-card-body { opacity: .82; }
+
+    /* ── EMPTY ── */
+    .empty-state {
+      background: var(--surface); border: 1px dashed var(--border);
+      border-radius: var(--radius); padding: 3rem 2rem;
+      text-align: center; color: var(--muted);
+    }
+    .empty-state svg { width: 40px; height: 40px; fill: var(--border); display: block; margin: 0 auto .75rem; }
+    .empty-state p { font-size: .88rem; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); backdrop-filter: blur(4px);
+      z-index: 1000; display: none; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; animation: fadeIn .2s ease; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; padding: 2rem 2.25rem; width: 440px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      animation: scaleIn .2s ease;
+    }
+    @keyframes scaleIn { from { transform:scale(.95); opacity:0; } to { transform:scale(1); opacity:1; } }
+    .modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: .4rem; font-weight: 400; }
+    .modal p  { font-size: .85rem; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.6; }
+    .modal-field { margin-bottom: 1rem; }
+    .modal-field label { display:block; font-size:.72rem; font-weight:600; color:var(--muted); margin-bottom:5px; text-transform:uppercase; letter-spacing:.05em; }
+    .modal-field textarea {
+      width:100%; padding:9px 13px;
+      background:var(--bg); border:1px solid var(--border); border-radius:8px;
+      font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text);
+      resize:vertical; min-height:80px; outline:none; transition:border-color .15s;
+    }
+    .modal-field textarea:focus { border-color: var(--accent2); }
+    .modal-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1.5rem; }
+    .btn-modal-cancel  { padding:8px 18px; border-radius:8px; font-size:.82rem; font-weight:500; background:var(--bg); border:1px solid var(--border); color:var(--muted); cursor:pointer; font-family:inherit; }
+    .btn-modal-danger  { padding:8px 18px; border-radius:8px; font-size:.82rem; font-weight:500; background:var(--danger); color:#fff; border:none; cursor:pointer; font-family:inherit; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--sidebar-bg); color: #fff;
+      padding: 11px 20px; border-radius: 10px;
+      font-size: .83rem; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      z-index: 9999;
+      transform: translateY(60px); opacity: 0;
+      transition: all .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    @media (max-width:900px) {
+      .appt-card-body { grid-template-columns:1fr; gap:1.5rem; }
+      .appt-details { border:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.25rem 0; }
+      .appt-actions-col { flex-direction:row; flex-wrap:wrap; }
+      .btn { width:auto; }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+    }
+    @media (max-width:760px) {
+      .main { padding:1.5rem 1.25rem; }
+      .topnav { padding:0 1rem; }
+      .pg-header h1 { font-size:1.5rem; }
+      .nav-tabs { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <a class="brand" href="#">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z"/></svg>
+    </div>
+    <span class="brand-name">MediCare</span>
+  </a>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('queue', this)">
+      Today's Queue <span class="tab-count">3</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('requests', this)">
+      Pending Requests <span class="tab-count">2</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('completed', this)">
+      Completed <span class="tab-count">4</span>
+    </button>
+  </div>
+
+  <div class="nav-right">
+    <div class="nav-avatar">AH</div>
+    <a class="logout" href="#">Sign out</a>
+  </div>
+</nav>
+
+<div class="shell">
+<main class="main">
+
+  <div class="pg-header">
+    <h1>Good morning, <em>Dr. Ahmed Hassan</em> 👨‍⚕️</h1>
+    <p>Cardiology &nbsp;·&nbsp; Saturday, 28 Feb 2026 &nbsp;·&nbsp; Session: 30 min</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card c-blue">
+      <div class="stat-label">Today's Patients</div>
+      <div class="stat-value">9</div>
+      <div class="stat-sub">Scheduled today</div>
+    </div>
+    <div class="stat-card c-green">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value">4</div>
+      <div class="stat-sub">Sessions done</div>
+    </div>
+    <div class="stat-card c-gold">
+      <div class="stat-label">Waiting</div>
+      <div class="stat-value">3</div>
+      <div class="stat-sub">In queue now</div>
+    </div>
+    <div class="stat-card c-red">
+      <div class="stat-label">Pending Requests</div>
+      <div class="stat-value">2</div>
+      <div class="stat-sub">Need your action</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════
+       TAB 1 · TODAY'S QUEUE
+  ═══════════════════════════════ -->
+  <div id="tab-queue" class="tab-panel active">
+    <section>
+      <div class="sec-head">Today's Queue <span>Ordered by check-in time</span></div>
+
+      <!-- #1 checked in – long wait -->
+      <div class="appt-card">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title">
+              <h3>Sara Mohamed</h3>
+              <p>Checked in at 09:02 AM &nbsp;·&nbsp; #1 in queue</p>
+            </div>
+          </div>
+          <div class="band-right">
+            <span class="wait-pill wait-long">⏱ 28m waiting</span>
+            <span class="status-badge s-checked_in"><span class="sbadge-dot"></span> Checked In</span>
+          </div>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">SM</div>
+            <div>
+              <div class="pat-name">Sara Mohamed</div>
+              <div class="pat-meta">Age 34 · Female</div>
+              <div class="pat-meta">+20 100 234 5678</div>
+            </div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item">
+              <label>Appointment Time</label>
+              <span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>09:00 AM</span>
+            </div>
+            <div class="detail-item">
+              <label>Reason</label>
+              <span>Chest pain follow-up</span>
+            </div>
+            <div class="detail-item">
+              <label>Session</label>
+              <span>30 min</span>
+            </div>
+            <div class="detail-item">
+              <label>Checked In</label>
+              <span><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>09:02 AM</span>
+            </div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-dark" onclick="showToast('Opening consultation record…','📋')">📋 Fill Consultation</button>
+            <button class="btn btn-red" onclick="openModal('noShowModal','Sara Mohamed')">Mark No Show</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- #2 checked in – medium wait -->
+      <div class="appt-card">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title">
+              <h3>Karim Youssef</h3>
+              <p>Checked in at 09:35 AM &nbsp;·&nbsp; #2 in queue</p>
+            </div>
+          </div>
+          <div class="band-right">
+            <span class="wait-pill wait-medium">⏱ 12m waiting</span>
+            <span class="status-badge s-checked_in"><span class="sbadge-dot"></span> Checked In</span>
+          </div>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">KY</div>
+            <div>
+              <div class="pat-name">Karim Youssef</div>
+              <div class="pat-meta">Age 51 · Male</div>
+              <div class="pat-meta">+20 111 876 5432</div>
+            </div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Appointment Time</label><span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>09:30 AM</span></div>
+            <div class="detail-item"><label>Reason</label><span>ECG review</span></div>
+            <div class="detail-item"><label>Session</label><span>30 min</span></div>
+            <div class="detail-item"><label>Checked In</label><span><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>09:35 AM</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-dark" onclick="showToast('Opening consultation record…','📋')">📋 Fill Consultation</button>
+            <button class="btn btn-red" onclick="openModal('noShowModal','Karim Youssef')">Mark No Show</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- #3 confirmed – not checked in yet -->
+      <div class="appt-card">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title">
+              <h3>Nour El-Din</h3>
+              <p>Appointment at 10:00 AM &nbsp;·&nbsp; #3 in queue</p>
+            </div>
+          </div>
+          <div class="band-right">
+            <span class="wait-pill wait-short">⏱ Not yet</span>
+            <span class="status-badge s-confirmed"><span class="sbadge-dot"></span> Confirmed</span>
+          </div>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">NE</div>
+            <div>
+              <div class="pat-name">Nour El-Din</div>
+              <div class="pat-meta">Age 29 · Female</div>
+              <div class="pat-meta">+20 122 345 6789</div>
+            </div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Appointment Time</label><span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>10:00 AM</span></div>
+            <div class="detail-item"><label>Reason</label><span>Blood pressure check</span></div>
+            <div class="detail-item"><label>Session</label><span>30 min</span></div>
+            <div class="detail-item"><label>Checked In</label><span style="color:var(--muted)">Awaiting…</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-green" onclick="showToast('Patient checked in!','✅')">✓ Check In</button>
+            <button class="btn btn-red" onclick="openModal('noShowModal','Nour El-Din')">Mark No Show</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ═══════════════════════════════
+       TAB 2 · PENDING REQUESTS
+  ═══════════════════════════════ -->
+  <div id="tab-requests" class="tab-panel">
+    <section>
+      <div class="sec-head">Pending Requests <span>Patients awaiting your confirmation</span></div>
+
+      <!-- Request 1 -->
+      <div class="appt-card">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">02</div><div class="mon">Mar</div></div>
+            <div class="appt-band-title">
+              <h3>Hana Khaled</h3>
+              <p>Requested 27 Feb · Mon 02 Mar at 11:00 AM</p>
+            </div>
+          </div>
+          <span class="status-badge s-requested"><span class="sbadge-dot"></span> Requested</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">HK</div>
+            <div>
+              <div class="pat-name">Hana Khaled</div>
+              <div class="pat-meta">Age 42 · Female</div>
+              <div class="pat-meta">+20 100 111 2222</div>
+            </div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Date & Time</label><span><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>02 Mar · 11:00 AM</span></div>
+            <div class="detail-item"><label>Reason</label><span>Heart palpitations</span></div>
+            <div class="detail-item"><label>Session</label><span>30 min</span></div>
+            <div class="detail-item"><label>Requested On</label><span>27 Feb 2026</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-green" onclick="showToast('Appointment confirmed!','✅')">✓ Confirm</button>
+            <button class="btn btn-red" onclick="openModal('declineModal','Hana Khaled')">✕ Decline</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Request 2 -->
+      <div class="appt-card">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">03</div><div class="mon">Mar</div></div>
+            <div class="appt-band-title">
+              <h3>Omar Farouk</h3>
+              <p>Requested 27 Feb · Tue 03 Mar at 02:00 PM</p>
+            </div>
+          </div>
+          <span class="status-badge s-requested"><span class="sbadge-dot"></span> Requested</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">OF</div>
+            <div>
+              <div class="pat-name">Omar Farouk</div>
+              <div class="pat-meta">Age 60 · Male</div>
+              <div class="pat-meta">+20 155 987 6543</div>
+            </div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Date & Time</label><span><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>03 Mar · 02:00 PM</span></div>
+            <div class="detail-item"><label>Reason</label><span>Post-surgery check</span></div>
+            <div class="detail-item"><label>Session</label><span>30 min</span></div>
+            <div class="detail-item"><label>Requested On</label><span>27 Feb 2026</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-green" onclick="showToast('Appointment confirmed!','✅')">✓ Confirm</button>
+            <button class="btn btn-red" onclick="openModal('declineModal','Omar Farouk')">✕ Decline</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- ═══════════════════════════════
+       TAB 3 · COMPLETED
+  ═══════════════════════════════ -->
+  <div id="tab-completed" class="tab-panel">
+    <section>
+      <div class="sec-head">Completed Today <span>4 sessions done</span></div>
+
+      <div class="appt-card dimmed">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title"><h3>Mona Hassan</h3><p>Completed at 08:45 AM</p></div>
+          </div>
+          <span class="status-badge s-completed"><span class="sbadge-dot"></span> Completed</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">MH</div>
+            <div><div class="pat-name">Mona Hassan</div><div class="pat-meta">Age 38 · Female</div></div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Time</label><span>08:00 AM</span></div>
+            <div class="detail-item"><label>Diagnosis</label><span>Hypertension Gr.1</span></div>
+            <div class="detail-item"><label>Duration</label><span>30 min</span></div>
+            <div class="detail-item"><label>Prescription</label><span>Amlodipine 5mg</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-ghost" onclick="showToast('Loading consultation…','📋')">👁 View Record</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="appt-card dimmed">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title"><h3>Tarek Samy</h3><p>Completed at 08:47 AM</p></div>
+          </div>
+          <span class="status-badge s-completed"><span class="sbadge-dot"></span> Completed</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">TS</div>
+            <div><div class="pat-name">Tarek Samy</div><div class="pat-meta">Age 55 · Male</div></div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Time</label><span>08:30 AM</span></div>
+            <div class="detail-item"><label>Diagnosis</label><span>Arrhythmia mild</span></div>
+            <div class="detail-item"><label>Duration</label><span>30 min</span></div>
+            <div class="detail-item"><label>Requested Test</label><span>Holter Monitor</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-ghost" onclick="showToast('Loading consultation…','📋')">👁 View Record</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="appt-card dimmed">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title"><h3>Layla Nasser</h3><p>Completed at 09:20 AM</p></div>
+          </div>
+          <span class="status-badge s-completed"><span class="sbadge-dot"></span> Completed</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">LN</div>
+            <div><div class="pat-name">Layla Nasser</div><div class="pat-meta">Age 47 · Female</div></div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Time</label><span>09:00 AM</span></div>
+            <div class="detail-item"><label>Diagnosis</label><span>Angina stable</span></div>
+            <div class="detail-item"><label>Duration</label><span>30 min</span></div>
+            <div class="detail-item"><label>Prescription</label><span>Nitroglycerin 0.5mg</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-ghost" onclick="showToast('Loading consultation…','📋')">👁 View Record</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="appt-card dimmed">
+        <div class="appt-card-band">
+          <div class="appt-band-left">
+            <div class="appt-date-badge"><div class="day">28</div><div class="mon">Feb</div></div>
+            <div class="appt-band-title"><h3>Yusuf Ibrahim</h3><p>Completed at 09:52 AM</p></div>
+          </div>
+          <span class="status-badge s-completed"><span class="sbadge-dot"></span> Completed</span>
+        </div>
+        <div class="appt-card-body">
+          <div class="pat-col">
+            <div class="pat-avatar">YI</div>
+            <div><div class="pat-name">Yusuf Ibrahim</div><div class="pat-meta">Age 63 · Male</div></div>
+          </div>
+          <div class="appt-details">
+            <div class="detail-item"><label>Time</label><span>09:30 AM</span></div>
+            <div class="detail-item"><label>Diagnosis</label><span>Heart failure Gr.II</span></div>
+            <div class="detail-item"><label>Duration</label><span>30 min</span></div>
+            <div class="detail-item"><label>Requested Test</label><span>Echo + BNP</span></div>
+          </div>
+          <div class="appt-actions-col">
+            <button class="btn btn-ghost" onclick="showToast('Loading consultation…','📋')">👁 View Record</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+</main>
+</div>
+
+<!-- NO SHOW MODAL -->
+<div class="modal-overlay" id="noShowModal">
+  <div class="modal">
+    <h3>Mark as No Show</h3>
+    <p>Are you sure you want to mark <strong id="noshow-name"></strong> as a no show?</p>
+    <div class="modal-field">
+      <label>Reason (optional)</label>
+      <textarea placeholder="e.g. Patient did not arrive after 15 minutes…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('noShowModal')">Cancel</button>
+      <button class="btn-modal-danger" onclick="closeModal('noShowModal'); showToast('Marked as no show','🔴')">Mark No Show</button>
+    </div>
+  </div>
+</div>
+
+<!-- DECLINE MODAL -->
+<div class="modal-overlay" id="declineModal">
+  <div class="modal">
+    <h3>Decline Appointment</h3>
+    <p>Declining request from <strong id="decline-name"></strong>. The patient will be notified.</p>
+    <div class="modal-field">
+      <label>Reason <span style="color:var(--danger)">*</span></label>
+      <textarea placeholder="e.g. Schedule conflict, fully booked on this date…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('declineModal')">Cancel</button>
+      <button class="btn-modal-danger" onclick="closeModal('declineModal'); showToast('Request declined','❌')">Decline</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+  function openModal(id, name) {
+    if (id === 'noShowModal')  document.getElementById('noshow-name').textContent  = name;
+    if (id === 'declineModal') document.getElementById('decline-name').textContent = name;
+    document.getElementById(id).classList.add('open');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+  document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  });
+  function showToast(msg, icon) {
+    const t = document.getElementById('toast');
+    t.textContent = (icon || '✅') + '  ' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

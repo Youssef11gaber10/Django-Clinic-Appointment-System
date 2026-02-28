@@ -383,12 +383,7 @@
 
               <!-- Actions -->
               <div class="appt-actions-col">
-                {% if appt.status == "requested" or appt.status == "confirmed" %}
-                <form action="{% url 'cancel_appointment' appt.id %}" method="POST">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-red">Cancel</button>
-                </form>
-                {% endif %}
+                cancel
               </div>
 
             </div>
