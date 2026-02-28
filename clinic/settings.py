@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
     'medical.apps.MedicalConfig',
     'scheduling.apps.SchedulingConfig',
+    # 'scheduling'
 ]
 
 MIDDLEWARE = [
