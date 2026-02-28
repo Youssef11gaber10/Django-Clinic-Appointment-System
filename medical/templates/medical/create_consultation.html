@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Consultation</title>
+</head>
+<body>
+<h2>Create Consultation</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+<a href="javascript:history.back()">Back</a>
+</body>
+</html>

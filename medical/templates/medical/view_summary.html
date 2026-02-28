@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Consultation Detail</title>
+</head>
+
+<body>
+    <h2>Consultation Detail</h2>
+    <p><strong>Appointment ID:</strong> {{ object.appointment.id }}</p>
+    <p><strong>Diagnosis:</strong> {{ object.diagnosis }}</p>
+    <p><strong>Notes:</strong> {{ object.notes }}</p>
+    <h3>Prescriptions</h3>
+    <div>
+        <a href="{% url 'create_prescription' object.id %}"><button type="button">Add Prescription</button></a>
+    </div>
+    <ul>
+        {% for pres in object.prescriptions.all %}
+        <li>
+            {{ pres.drug_name }} - {{ pres.dose }} - {{ pres.duration }}
+            <a href="{% url 'edit_prescription' pres.id %}"><button type="button">Edit</button></a>
+        </li>
+        {% empty %}
+        <li>No prescriptions</li>
+        {% endfor %}
+    </ul>
+
+
+    <h3>Requested Tests</h3>
+    <div>
+        <a href="{% url 'add_test' object.id %}"><button type="button">Add Test</button></a>
+    </div>
+    <ul>
+        {% for test in object.tests.all %}
+        <li>
+            {{ test.test_name }} - {{ test.notes }}
+            <a href="{% url 'edit_test' test.id %}"><button type="button">Edit</button></a>
+        </li>
+        {% empty %}
+        <li>No tests requested</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'consultation_edit' object.id %}">Edit Consultation</a>
+</body>
+
+</html>
