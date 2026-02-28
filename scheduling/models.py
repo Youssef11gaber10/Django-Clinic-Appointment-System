@@ -78,7 +78,7 @@ class Availability(models.Model):
     date_of_week = models.CharField(max_length=10, choices=DayOfWeek.choices)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    is_exception = models.BooleanField(default=True)
+    is_exception = models.BooleanField(default=False)
     slot_duration = models.PositiveIntegerField(default=15)
     buffer_time = models.PositiveIntegerField(default=5)
 
@@ -86,7 +86,7 @@ class Availability(models.Model):
         unique_together = ('doctor', 'date_of_week', 'start_time')
 
     def __str__(self):
-        return f"{self.doctor} - {self.date} from {self.start_time} to {self.end_time}"
+        return f"{self.doctor} - {self.date_of_week} from {self.start_time} to {self.end_time}"
 
 
 # doctor exception for specific date
