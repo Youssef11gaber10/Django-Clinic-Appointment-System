@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('__debug__/' , include('debug_toolbar.urls')),
+    # path('__debug__/' , include('debug_toolbar.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('medical/',include('medical.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
