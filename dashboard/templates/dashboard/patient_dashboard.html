@@ -285,17 +285,19 @@
     </button>
   </div>
 
-  <div class="nav-right">
-    <div class="nav-avatar">{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}</div>
-    <a class="logout" href="{% url 'logout' %}">Sign out</a>
-  </div>
+<div class="nav-right">
+  <a href="{% url 'profile' %}" class="nav-avatar">
+    {{ user.username|first|upper }}
+  </a>
+
+</div>
 </nav>
 
 <div class="shell">
   <main class="main">
 
     <div class="pg-header">
-      <h1>Welcome, <em>{{ request.user.first_name }} {{ request.user.last_name }}</em> 👋</h1>
+      <h1>Welcome, <em>{{ user.first_name }} {{ user.last_name }}</em> 👋</h1>
       <p>Here's a summary of your health activity.</p>
     </div>
 
@@ -323,7 +325,7 @@
                   </div>
                 </div>
                 <div class="appt-band-title">
-                  <h3>Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</h3>
+                  <h3>Dr. {{ appt.doctor.doctor_profile.username }} {{ appt.doctor.user.last_name }}</h3>
                   <p>{{ appt.doctor.specialization }}</p>
                 </div>
               </div>

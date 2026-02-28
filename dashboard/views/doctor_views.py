@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from appointments.models import Appointment
 from datetime import date
+from django.utils import timezone
 
 
 from datetime import date, time, datetime
@@ -67,32 +68,35 @@ queue_data = [
         "wait_minutes": None,
     },
 ]
-def get_today_appointments(doctor):
-    statuses = ["CONFIRMED", "CHECKED_IN"]
-    today = date.today()
-
-    # return (
-    #     Appointment.objects
-    #     .filter(
-    #         doctor=doctor,
-    #         status__in=statuses,
-    #         slot__start_datetime__date=today,
-    #     )
-    #     .order_by("checked_in_at")
-    #     .select_related(
-    #         "slot",
-    #         "patient",
-    #         "patient__user",
-    #     )
-    # )
-
+def get_today_appointments(doctor_id):
+    today = timezone.localdate()  # handles timezone correctly
+    statuses = [Appointment.CONFIRMED, Appointment.CHECKED_IN]
+    return (
+        Appointment.objects
+        .select_related("patient__patient_profile", "slot")
+        .filter(
+            doctor_id=doctor_id,
+            slot__start_time__date=today,
+            status__in=statuses
+        )
+        .order_by("slot__start_time")
+    )
 @login_required
 def doctor_dashboard(request):
 
-    # today_queue = get_today_appointments(doctor)
+    today_appointments = get_today_appointments(request.user.id)
 
+    queue_data = []
+    for appointment in today_appointments:
+        queue_data.append({
+            "patient": appointment.patient,
+            "slot": appointment.slot,
+            "status": appointment.status,
+        })    
+
+    print(queue_data[0]["patient"].patient_profile.gender)
 
     context = {
-        "today_queue": queue_data,
+        "today_queue": today_appointments,
     }
     return render(request, "dashboard/doctor_dashboard.html", context)

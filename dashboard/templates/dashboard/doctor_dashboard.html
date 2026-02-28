@@ -143,18 +143,15 @@
     <button class="nav-tab active" onclick="switchTab('queue', this)">
       Today's Queue <span class="tab-count">{{ today_queue|length }}</span>
     </button>
-    <button class="nav-tab" onclick="switchTab('requests', this)">
-      Pending Requests <span class="tab-count">{{ pending_requests|length }}</span>
-    </button>
     <button class="nav-tab" onclick="switchTab('completed', this)">
       Completed <span class="tab-count">{{ stats.completed_today }}</span>
     </button>
   </div>
 
   <div class="nav-right">
-    <div class="nav-avatar">
+    <a href="{% url 'profile' %}" class="nav-avatar">
       {{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}
-    </div>
+    </a>
     <a class="logout" href="{% url 'logout' %}">Sign out</a>
   </div>
 </nav>
@@ -164,32 +161,8 @@
 
   <!-- HEADER -->
   <div class="pg-header">
-    <h1>Good morning, <em>Dr. {{ request.user.get_full_name }}</em> 👨‍⚕️</h1>
-    <p>{{ doctor_profile.specialization }} &nbsp;·&nbsp; {% now "l, d M Y" %} &nbsp;·&nbsp; Session: {{ doctor_profile.session_duration }} min</p>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card c-blue">
-      <div class="stat-label">Today's Patients</div>
-      <div class="stat-value">{{ stats.today_total }}</div>
-      <div class="stat-sub">Scheduled today</div>
-    </div>
-    <div class="stat-card c-green">
-      <div class="stat-label">Completed</div>
-      <div class="stat-value">{{ stats.completed_today }}</div>
-      <div class="stat-sub">Sessions done</div>
-    </div>
-    <div class="stat-card c-gold">
-      <div class="stat-label">Waiting</div>
-      <div class="stat-value">{{ stats.waiting }}</div>
-      <div class="stat-sub">In queue now</div>
-    </div>
-    <div class="stat-card c-red">
-      <div class="stat-label">Pending Requests</div>
-      <div class="stat-value">{{ pending_requests|length }}</div>
-      <div class="stat-sub">Need your action</div>
-    </div>
+    <h1>Good morning, <em>Dr. {{ user.get_full_name }}</em> 👨‍⚕️</h1>
+    <p>{{ user.doctor_profile.specialization }} &nbsp;·&nbsp; {% now "l, d M Y" %} &nbsp;·&nbsp; Session: {{ user.doctor_profile.session_duration }} min</p>
   </div>
 
   <!-- ═══════════════════════════
@@ -210,11 +183,11 @@
           <div class="appt-card-band">
             <div class="appt-band-left">
               <div class="appt-date-badge">
-                <div class="day">{{ appt.slot.start_datetime|date:"d" }}</div>
-                <div class="mon">{{ appt.slot.start_datetime|date:"M" }}</div>
+                <div class="day">{{ appt.slot.start_time|date:"d" }}</div>
+                <div class="mon">{{ appt.slot.end_time|date:"M" }}</div>
               </div>
               <div class="appt-band-title">
-                <h3>{{ appt.patient.user.get_full_name }}</h3>
+                <h3>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</h3>
                 <p>
                   {% if appt.checked_in_at %}
                     Checked in at {{ appt.checked_in_at|date:"g:i A" }} &nbsp;·&nbsp;
@@ -248,17 +221,17 @@
             <!-- Patient -->
             <div class="pat-col">
               <div class="pat-avatar">
-                {{ appt.patient.user.first_name|first|upper }}{{ appt.patient.user.last_name|first|upper }}
+                {{ appt.patient.first_name|first|upper }}{{ appt.patient.last_name|first|upper }}
               </div>
               <div>
-                <div class="pat-name">{{ appt.patient.user.get_full_name }}</div>
+                <div class="pat-name">{{ appt.patient.get_full_name }}</div>
                 <div class="pat-meta">
-                  {% if appt.patient.date_of_birth %}
-                    Age {{ appt.patient.date_of_birth|timesince|truncatewords:1 }} ·
+                  {% if appt.patient.patient_profile.date_of_birth %}
+                    <strong>Age</strong>: {{ appt.patient.patient_profile.date_of_birth|timesince }}
                   {% endif %}
-                  {% if appt.patient.gender == 'M' %}Male{% elif appt.patient.gender == 'F' %}Female{% endif %}
                 </div>
-                <div class="pat-meta">{{ appt.patient.phone }}</div>
+                <div class="pat-meta"> <strong>Gender</strong>: {{ appt.patient.patient_profile.gender }}</div>
+                <div class="pat-meta"><strong>Phone</strong>: {{ appt.patient.phone_number }}</div>
               </div>
             </div>
 
@@ -268,30 +241,9 @@
                 <label>Appointment Time</label>
                 <span>
                   <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
-                  {{ appt.slot.start_datetime|date:"g:i A" }}
+                  {{ appt.slot.start_time|date:"g:i A" }}
                 </span>
               </div>
-              <div class="detail-item">
-                <label>Reason</label>
-                <span>{{ appt.reason|default:"General consultation" }}</span>
-              </div>
-              <div class="detail-item">
-                <label>Session</label>
-                <span>{{ doctor_profile.session_duration }} min</span>
-              </div>
-              <div class="detail-item">
-                <label>Checked In</label>
-                {% if appt.checked_in_at %}
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                    {{ appt.checked_in_at|date:"g:i A" }}
-                  </span>
-                {% else %}
-                  <span style="color:var(--muted)">Awaiting…</span>
-                {% endif %}
-              </div>
-
-
           </div>
         </div>
         {% endfor %}
@@ -374,9 +326,6 @@
                 <span>{{ appt.created_at|date:"d M Y" }}</span>
               </div>
             </div>
-
-  
-
           </div>
         </div>
         {% endfor %}
