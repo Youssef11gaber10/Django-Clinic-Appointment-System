@@ -1,0 +1,25 @@
+<h2>Reschedule Appointment</h2>
+
+<p>Current time: {{ appointment.slot.start_time }}</p>
+
+<form method="post">
+  {% csrf_token %}
+
+  <label>Select new slot:</label>
+  <select name="slot_id">
+    {% for slot in available_slots %}
+      <option value="{{ slot.id }}">
+        {{ slot.start_time }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <br><br>
+
+  <label>Reason:</label>
+  <textarea name="reason"></textarea>
+
+  <br><br>
+
+  <button type="submit">Confirm Reschedule</button>
+</form>
