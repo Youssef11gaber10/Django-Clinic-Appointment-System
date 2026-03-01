@@ -1,5 +1,10 @@
 from django.db import models
 from django.conf import settings
+from django.db import transaction , IntegrityError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db.models import Q
+from django.utils import timezone
+
 from scheduling.models import Slot
 # Create your models here.
 class Appointment(models.Model):
@@ -36,7 +41,89 @@ class Appointment(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['slot'], name = 'unique_slot')
         ] 
+    
+    @transaction.atomic
+    @classmethod
+    def request_appointment(cls , slot , patient):
+        active_statuses = [
+        cls.REQUESTED,
+        cls.CONFIRMED,
+        cls.CHECKED_IN,
+    ]
+        overlapping_exists = cls.objects.filter(
+        patient=patient,
+        status__in=active_statuses,
+        slot__start_time__lt=slot.end_time,
+        slot__end_time__gt=slot.start_time,
+    ).exists()
+        
+        if overlapping_exists:
+            raise ValidationError("You already have an overlapping appointment.")
+        
+        if not slot.is_available:
+            raise ValidationError("This slot has already been booked.")
+        
+        try:
+            appointment = cls.objects.create(
+            slot=slot,
+            patient=patient,
+            )
+            slot.is_available = False
+            slot.save()
+            return appointment
+        except IntegrityError:
+              raise ValidationError("This slot has been booked by someone else.")
+        
+    @transaction.atomic
+    def confirm_appointment(self):
+        if self.status != self.REQUESTED:
+            raise ValidationError("Only appointments with status REQUESTED can be confirmed.")
+        self.status = self.CONFIRMED
+        self.save()
 
+    
+    @transaction.atomic
+    def cancel_appointment(self):
+        if self.status not in [self.REQUESTED , self.CONFIRMED]:
+            raise ValidationError("Appointment cannot be cancelled in its current status.")
+        self.status = self.CANCELLED
+        self.save()
+        self.slot.is_available = True
+        self.slot.save()
+
+
+    @transaction.atomic
+    def check_in_appointment(self):
+        if self.status != self.CONFIRMED:
+            raise ValidationError("Only confirmed appointments can be checked in.")
+        # now = timezone.now()
+        self.status = self.CHECKED_IN
+        # self.check_in_at = now
+        self.save()
+
+    @transaction.atomic
+    def mark_no_show(self):
+        if self.status != self.CONFIRMED:
+            raise ValidationError("Only confirmed appointments can be marked as no show.")
+        self.status = self.NO_SHOW
+        self.save()
+
+
+    @transaction.atomic
+    def complete_appointment(self):
+        if self.status != self.CHECKED_IN:
+            raise ValidationError("only checked-in appointments can be completed.")
+        try:
+            consultation = self.consultation  
+        except ObjectDoesNotExist:
+            raise ValidationError("consultation required first")
+        self.status = self.COMPLETED
+        self.save()
+
+
+
+
+    
     def __str__(self):
         return f"Appointment #{self.id} - {self.patient.username}"
 
