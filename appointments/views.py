@@ -62,4 +62,4 @@ def complete_appointment(request, appointment_id):
         messages.success(request, "Appointment completed.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("")
+    return redirect("doctor_dashboard")

@@ -231,7 +231,7 @@
 </div>
 
 {% if request.user.role == "doctor" %}
-    <a href="{% url 'doctor_dashboard' %}" class="btn btn-dark">
+    <a href="{% url 'complete_appointment' object.appointment.id %}" class="btn btn-dark">
         ✅ Finish Consultation
     </a>
 {% endif %}
