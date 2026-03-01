@@ -27,7 +27,7 @@ def admin_register(request):
             elif user.role == 'doctor':
                 DoctorProfile.objects.create(user=user)
             messages.success(request, f'{user.role.capitalize()} account has been created successfully.')
-            return redirect('login')
+            return redirect('users_list')
     else:
         form = BaseUserCreationForm()
     return render(request, 'registration/admin_register.html', {'form': form})

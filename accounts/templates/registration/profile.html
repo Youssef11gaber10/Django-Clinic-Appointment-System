@@ -1,68 +1,370 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Profile</title>
-    <style>
-      .success {
-        color: green;
-        font-weight: bold;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Welcome, {{ user.username }}!</h1>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile · MediCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #f5f3ef;
+      --surface:     #ffffff;
+      --sidebar-bg:  #1a1a2e;
+      --accent:      #c8a97e;
+      --accent2:     #6a9fb5;
+      --text:        #1c1c1c;
+      --muted:       #7a7a7a;
+      --border:      #e5e2da;
+      --success:     #6abf8a;
+      --danger:      #e07070;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(0,0,0,.07);
+      --nav-h:       64px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-shadow: 0 1px 8px rgba(0,0,0,.04);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--sidebar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .nav-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: .82rem;
+      color: #fff;
+    }
+    .logout {
+      font-size: .83rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all .15s;
+    }
+    .logout:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .main {
+      flex: 1;
+      padding: 2.5rem 2.5rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      animation: fadeUp .42s ease both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .pg-header {
+      margin-bottom: 2rem;
+    }
+    .pg-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1.2;
+      font-weight: 400;
+    }
+    .pg-header h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .pg-header p {
+      margin-top: .3rem;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .messages {
+      margin-bottom: 1.5rem;
+    }
+    .message {
+      padding: 1rem 1.2rem;
+      border-radius: var(--radius);
+      border: 1px solid;
+    }
+    .message.success {
+      background: #e8f5ec;
+      color: #2e7d4f;
+      border-color: #b8dfc5;
+    }
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .profile-info h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: .3rem;
+    }
+    .profile-info p {
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    .profile-section {
+      margin-bottom: 2rem;
+    }
+    .profile-section h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-row {
+      display: flex;
+      padding: .8rem 0;
+      border-bottom: 1px solid rgba(0,0,0,.03);
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: var(--text);
+      min-width: 140px;
+      font-size: .88rem;
+      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+    .detail-value {
+      flex: 1;
+      color: var(--text);
+      font-size: .95rem;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .15s;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .btn-primary {
+      background: var(--sidebar-bg);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #2e2e4a;
+    }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <div class="topnav">
+    <a href="#" class="brand">
+      <div class="brand-icon">⚕️</div>
+      <div class="brand-name">MediCare</div>
+    </a>
+    <div class="nav-right">
+      <div class="nav-avatar">{{ user.first_name|first|upper }}</div>
+      <a href="{% url 'logout' %}" class="logout">Logout</a>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="pg-header">
+      <h1>Welcome, <em>{{ user.username }}</em></h1>
+      <p>Manage your profile and account settings</p>
+    </div>
 
     {% if messages %}
-    <div class="messages">
+      <div class="messages">
       {% for message in messages %}
-      <div class="message {{ message.tags }}">
-        <strong>{{ message }}</strong>
-      </div>
+        <div class="message {{ message.tags }}">
+          <strong>{{ message }}</strong>
+        </div>
       {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="profile-card">
+      <div class="profile-header">
+        <div class="profile-avatar">{{ user.first_name|first|upper }}</div>
+        <div class="profile-info">
+          <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+          <p>@{{ user.username }}</p>
+          <p style="margin-top: .5rem; font-size: .8rem;">Member since {{ user.date_joined|date:"M d, Y" }}</p>
+        </div>
+      </div>
+
+      {% if user.role == 'patient' %}
+        <div class="profile-section">
+          <h3>Patient Details</h3>
+          <div class="detail-row">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ user.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Role</span>
+            <span class="detail-value"><span style="background: #e8f5ec; color: #2e7d4f; padding: 2px 8px; border-radius: 4px; font-size: .75rem; font-weight: 600;">{{ user.role|upper }}</span></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone</span>
+            <span class="detail-value">{{ user.phone_number|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date of Birth</span>
+            <span class="detail-value">{{ profile.date_of_birth|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Gender</span>
+            <span class="detail-value">{{ profile.gender|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Address</span>
+            <span class="detail-value">{{ profile.address|default:"Not provided" }}</span>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if user.role == 'doctor' %}
+        <div class="profile-section">
+          <h3>Doctor Details</h3>
+          <div class="detail-row">
+            <span class="detail-label">Email</span>
+            <span class="detail-value">{{ user.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Role</span>
+            <span class="detail-value"><span style="background: #e3f1f7; color: #1a6180; padding: 2px 8px; border-radius: 4px; font-size: .75rem; font-weight: 600;">{{ user.role|upper }}</span></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone</span>
+            <span class="detail-value">{{ user.phone_number|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Specialization</span>
+            <span class="detail-value">{{ profile.specialization|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Bio</span>
+            <span class="detail-value">{{ profile.bio|default:"Not provided" }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Session Duration</span>
+            <span class="detail-value">{{ profile.session_duration|default:"Not provided" }} mins</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Session Price</span>
+            <span class="detail-value">${{ profile.session_price|default:"Not provided" }}</span>
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="action-buttons">
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+        {% if user.role == 'patient' %}
+          <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
+        {% elif user.role == 'doctor' %}
+          <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
+        {% elif user.role == 'admin' %}
+          <a href="{% url 'user_list' %}" class="btn btn-secondary">Manage Users</a>
+        {% endif %}
+        <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+      </div>
     </div>
-    {% endif %}
-
-    <h2>Your Profile</h2>
-    {% if user.role == 'patient' %}
-        <h3>Patient Details</h3>
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Role:</strong> {{ user.role }}</p>
-        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
-        <p><strong>Date of Birth:</strong> {{ profile.date_of_birth }}</p>
-        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
-        <p><strong>Address:</strong> {{ profile.address }}</p>
-        <p><strong>Gender:</strong> {{ profile.gender }}</p>
-    {% endif %}
-
-    {% if user.role == 'doctor' %}
-        <h3>Doctor Details</h3>
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Role:</strong> {{ user.role }}</p>
-        <p><strong>Member Since:</strong> {{ user.date_joined|date:"Y-m-d" }}</p>
-        <p><strong>Specialization:</strong> {{ profile.specialization }}</p>
-        <p><strong>Phone Number:</strong> {{ user.phone_number }}</p>
-        <p><strong>Bio:</strong> {{ profile.bio }}</p>
-        <p><strong>Session Duration:</strong> {{ profile.session_duration }}</p>
-        <p><strong>Session Price:</strong> {{ profile.session_price }}</p>
-    {% endif %}
-
-    <hr />
-    <a href="{% url 'logout' %}">Logout</a>
-    <a href="{% url 'edit_profile' %}">Edit Profile</a>
-    <div class="dashboard-links">
-    {% if user.role == 'patient' %}
-        <a href="{% url 'patient_dashboard' %}" class="btn btn-primary">View Patient Dashboard</a>
-    {% elif user.role == 'doctor' %}
-        <a href="{% url 'doctor_dashboard' %}" class="btn btn-primary">View Doctor Dashboard</a>
-    {% elif user.role == 'admin' %}
-        <a href="{% url 'user_list' %}" class="btn btn-primary">View Users</a>
-    {% endif %}
-</div>
-  </body>
+  </div>
+</body>
 </html>
