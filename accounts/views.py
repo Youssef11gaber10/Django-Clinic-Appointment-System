@@ -110,9 +110,13 @@ def edit_profile(request):
             except DoctorProfile.DoesNotExist:
                 messages.error(request, 'Doctor profile not found.')
                 return redirect('profile')
-        if user_form.is_valid() and profile_form.is_valid():
+        else:
+            profile_form = None
+        
+        if user_form.is_valid() and (profile_form is None or profile_form.is_valid()):
             user_form.save()
-            profile_form.save()
+            if profile_form:
+                profile_form.save()
             messages.success(request, 'Your profile has been updated successfully.')
             return redirect('profile')
     else:
