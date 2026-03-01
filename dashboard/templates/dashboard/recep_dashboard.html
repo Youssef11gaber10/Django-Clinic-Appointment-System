@@ -7,9 +7,9 @@
 
 <body>
     <h1>Receptionist Dashboard</h1>
-    <a href="{% url 'dashboard:add_availability' %}">Add Availability</a>
+    <a href="{% url 'add_availability' %}">Add Availability</a>
     <br>
-    <a href="{% url 'dashboard:generate_slots' %}">Generate Slots</a>
+    <a href="{% url 'generate_slots' %}">Generate Slots</a>
     <hr>
     {% for doctor in doctors %}
     <h2>Doctor: {{ doctor.username }}</h2>

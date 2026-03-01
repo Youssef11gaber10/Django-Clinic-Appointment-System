@@ -392,7 +392,7 @@
         {% elif user.role == 'admin' %}
           <a href="{% url 'users_list' %}" class="btn btn-secondary">Manage Users</a>
         {% elif user.role == 'receptionist' %}
-          <a href="{% url 'dashboard:recep_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
+          <a href="{% url 'recep_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
         {% endif %}
       </div>
     </div>

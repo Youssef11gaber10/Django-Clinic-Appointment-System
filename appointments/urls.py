@@ -1,7 +1,7 @@
 from django.urls import path
 from appointments.views import book_appointment , cancel_appointment , check_in_appointment , complete_appointment , confirm_appointment,mark_no_show_appointment
 
-app_name = "appointments"
+# app_name = "appointments"
 
 
 urlpatterns = [
