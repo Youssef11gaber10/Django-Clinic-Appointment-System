@@ -1,4 +1,6 @@
+{% extends "dashboard/base.html" %}
 {% load static %}
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 
@@ -860,3 +862,81 @@
 </body>
 
 </html>
+=======
+
+{% block title %}Patient Portal · MediCare{% endblock %}
+
+{% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
+
+{% block nav_tabs %}
+  <button class="nav-tab active" onclick="switchTab('upcoming', this)">
+    Upcoming
+    <span class="tab-count">{{ upcoming_appointments|length }}</span>
+  </button>
+  <button class="nav-tab" onclick="switchTab('previous', this)">
+    Previous
+    <span class="tab-count">{{ previous_appointments|length }}</span>
+  </button>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+  /* Patient-only additions */
+  .appt-card.previous .appt-card-band { background: #3a3a4a; }
+  .appt-card.previous .appt-card-body { opacity: .85; }
+  .doc-col { display: flex; align-items: center; gap: .9rem; min-width: 190px; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+  <!-- ── Page header ── -->
+  <div class="pg-header">
+    <h1>Welcome, <em>{{ user.first_name }} {{ user.last_name }}</em> 👋</h1>
+    <p>Here's a summary of your health activity.</p>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 1 · UPCOMING
+  ══════════════════════════════ -->
+  <div id="tab-upcoming" class="tab-panel active">
+    <section>
+      <div class="sec-head">Upcoming Appointments</div>
+
+      {% if upcoming_appointments %}
+        {% for appt in upcoming_appointments %}
+
+          {% include "dashboard/appt_card_patient.html" with appt=appt is_previous=False %}
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          <p>You have no upcoming appointments.</p>
+          <a href="#">Book an appointment →</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 2 · PREVIOUS
+  ══════════════════════════════ -->
+  <div id="tab-previous" class="tab-panel">
+    <section>
+      <div class="sec-head">Previous Appointments</div>
+
+      {% if previous_appointments %}
+        {% for appt in previous_appointments %}
+          {% include "dashboard/appt_card_patient.html" with appt=appt is_previous=True %}
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+          <p>No previous appointments found.</p>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+
+{% endblock %}
+>>>>>>> 7853cd6514b70a4dbcb9a436a9748a5d05241e66

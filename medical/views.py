@@ -239,6 +239,24 @@ def edit_test(request, pk):
 # 
 # 
 # 
+def view_summary(request, pk):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    consultation = get_object_or_404(Consultation, pk=pk)
+
+    if request.user.role == "patient":
+        if consultation.appointment.patient != request.user:
+            return HttpResponseForbidden()
+        return render(request, "medical/view_summary.html", {"object": consultation})
+
+    elif request.user.role == "doctor":
+        return render(request, "medical/view_summary.html", {"object": consultation})
+
+    else:
+        return HttpResponseForbidden()
+
+
 
 
 

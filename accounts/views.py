@@ -153,12 +153,14 @@ def admin_edit_user(request, user_id):
         user_form = UserUpdateForm(request.POST, instance=user)
         if user_form.is_valid():
             user_form.save()
+            is_active = request.POST.get('is_active') == 'on'
+            user.is_active = is_active
+            user.save()
             messages.success(request, f'{user.role.capitalize()} account has been updated successfully.')
             return redirect('users_list')
     else:
         user_form = UserUpdateForm(instance=user)
-    return render(request, 'registration/edit_profile.html', {'user_form': user_form, 'user': user})
-
+    return render(request, 'registration/edit_profile.html', {'user_form': user_form, 'user': user, 'is_admin_edit': True})
 def admin_delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)

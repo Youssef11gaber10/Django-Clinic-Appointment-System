@@ -13,7 +13,7 @@ class Consultation(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     appointment = models.OneToOneField(Appointment,
                                        on_delete=models.CASCADE,
-                                       related_name='consultations')
+                                       related_name='consultation')
     # created_by = models.ForeignKey(
     # settings.AUTH_USER_MODEL,
     # on_delete=models.SET_NULL,

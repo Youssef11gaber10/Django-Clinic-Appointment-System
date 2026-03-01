@@ -1,0 +1,111 @@
+{% load static %}
+
+<div class="appt-card {% if is_previous %}previous{% endif %}">
+
+  <!-- ── Band ── -->
+  <div class="appt-card-band">
+    <div class="appt-band-left">
+      <div class="appt-date-badge">
+        <div class="day">{{ appt.slot.start_time|date:"d" }}</div>
+        <div class="mon">{{ appt.slot.start_time|date:"M" }}</div>
+      </div>
+      <div class="appt-band-title">
+        <h3>Dr. {{ appt.doctor.first_name }} {{ appt.doctor.last_name }}</h3>
+        <p>{{ appt.doctor.specialization }}</p>
+      </div>
+    </div>
+    <span class="status-badge s-{{ appt.status }}">
+      <span class="sbadge-dot"></span>
+      {{ appt.get_status_display }}
+    </span>
+  </div>
+
+  <!-- ── Body ── -->
+  <div class="appt-card-body">
+
+    <!-- Doctor column -->
+    <div class="doc-col">
+      <img src="{% static 'images/default_doctor.jpg' %}" width="52" height="52"
+           style="border-radius:50%; object-fit:cover; flex-shrink:0;"
+           alt="Dr. {{ appt.doctor.user.last_name }}"
+           onerror="this.style.display='none'">
+      <div>
+        <div class="doc-name" style="font-weight:600; font-size:.95rem;">
+          Dr. {{ appt.doctor.first_name }} {{ appt.doctor.last_name }}
+        </div>
+        <div class="doc-spec" style="font-size:.78rem; color:var(--muted); margin-top:2px;">
+          {{ appt.doctor.specialization }}
+        </div>
+        {% if appt.doctor.bio %}
+          <div class="doc-bio" style="font-size:.78rem; color:var(--muted); margin-top:2px;">
+            {{ appt.doctor.bio|truncatechars:60 }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Details grid -->
+    <div class="appt-details">
+      <div class="detail-item">
+        <label>Date</label>
+        <span>
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+          {{ appt.slot.start_time|date:"d M Y" }}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Time</label>
+        <span>
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+          {{ appt.slot.start_time|date:"g:i A" }} – {{ appt.slot.end_time|date:"g:i A" }}
+        </span>
+      </div>
+     
+      <div class="detail-item">
+        <label>Status</label>
+        <span>{{appt.status}}</span>
+      </div>
+      {% if is_previous and appt.check_in_at %}
+        <div class="detail-item">
+          <label>Checked In</label>
+          <span>
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            {{ appt.check_in_at|date:"g:i A" }}
+          </span>
+        </div>
+      {% endif %}
+      <div class="detail-item">
+        <label>Doctor Email</label>
+        <span>{{ appt.doctor.email }}</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="appt-actions-col">
+      {% if is_previous %}
+        {% if appt.consultation %}
+          <a href="{% url 'view_summary' appt.consultation.id %}"
+             style="text-decoration:none;"
+             class="btn btn-dark">👁 View Consultation</a>
+        {% else %}
+          <span class="btn btn-ghost" style="cursor:default; opacity:.6;">No Record</span>
+        {% endif %}
+      {% else %}
+        {% if appt.status == 'requested' or appt.status == 'confirmed' %}
+          <form method="POST" action="{% url 'cancel_appointment' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-red"
+                    onclick="return confirm('Cancel this appointment?')">
+              ✕ Cancel
+            </button>
+          </form>
+        {% else %}
+          <span class="btn btn-ghost" style="cursor:default; opacity:.6;">
+            {{ appt.get_status_display }}
+          </span>
+        {% endif %}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
