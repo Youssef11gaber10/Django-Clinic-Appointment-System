@@ -37,7 +37,7 @@
     .tab-count { background: var(--accent); color: #fff; font-size: .67rem; font-weight: 700; padding: 1px 6px; border-radius: 10px; line-height: 1.4; }
     .nav-tab.active .tab-count { background: var(--sidebar-bg); }
     .nav-right { display: flex; align-items: center; gap: 1rem; }
-    .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .82rem; color: #fff; }
+    .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: .82rem; color: #fff; text-decoration: none; }
     .logout { font-size: .83rem; color: var(--muted); text-decoration: none; padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px; transition: all .18s; }
     .logout:hover { background: var(--bg); color: var(--text); }
     .shell { display: flex; flex: 1; }
@@ -47,16 +47,6 @@
     .pg-header h1 { font-family: 'DM Serif Display', serif; font-size: 2rem; line-height: 1.2; font-weight: 400; }
     .pg-header h1 em { font-style: italic; color: var(--accent); }
     .pg-header p { margin-top: .3rem; color: var(--muted); font-size: .88rem; }
-    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 2rem; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem 1.4rem; box-shadow: var(--shadow); position: relative; overflow: hidden; }
-    .stat-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px; }
-    .stat-card.c-blue::after   { background: var(--accent2); }
-    .stat-card.c-green::after  { background: var(--success); }
-    .stat-card.c-gold::after   { background: var(--accent); }
-    .stat-card.c-red::after    { background: var(--danger); }
-    .stat-label { font-size: .7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
-    .stat-value { font-family: 'DM Serif Display', serif; font-size: 2.4rem; line-height: 1; margin-top: 4px; }
-    .stat-sub   { font-size: .75rem; color: var(--muted); margin-top: 3px; }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; animation: fadeUp .3s ease both; }
     section { margin-bottom: 2.5rem; }
@@ -94,7 +84,7 @@
     .detail-item span { font-size: .88rem; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 5px; }
     .detail-item span svg { width: 13px; height: 13px; fill: var(--accent2); flex-shrink: 0; }
     .appt-actions-col { display: flex; flex-direction: column; gap: .5rem; min-width: 130px; }
-    .btn { padding: 7px 16px; border-radius: 8px; font-size: .8rem; font-weight: 500; cursor: pointer; border: none; font-family: inherit; transition: all .14s; text-align: center; width: 100%; }
+    .btn { padding: 7px 16px; border-radius: 8px; font-size: .8rem; font-weight: 500; cursor: pointer; border: none; font-family: inherit; transition: all .14s; text-align: center; width: 100%; display: inline-block; text-decoration: none; }
     .btn-dark  { background: var(--sidebar-bg); color: #fff; }
     .btn-dark:hover  { background: #2e2e4a; }
     .btn-green { background: #e8f5ec; color: #2e7d4f; border: 1px solid #b8dfc5; }
@@ -103,6 +93,8 @@
     .btn-ghost:hover { background: var(--bg); }
     .btn-red   { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
     .btn-red:hover   { background: #fdf0f0; }
+    .btn-gold  { background: #fdf3e0; color: #8a5e00; border: 1px solid #e8d5a3; }
+    .btn-gold:hover  { background: #f9ead0; }
     .appt-card.dimmed .appt-card-band { background: #3a3a4a; }
     .appt-card.dimmed .appt-card-body { opacity: .82; }
     .empty-state { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); padding: 3rem 2rem; text-align: center; color: var(--muted); }
@@ -124,7 +116,7 @@
     .btn-modal-danger { padding:8px 18px; border-radius:8px; font-size:.82rem; font-weight:500; background:var(--danger); color:#fff; border:none; cursor:pointer; font-family:inherit; }
     .toast { position: fixed; bottom: 24px; right: 24px; background: var(--sidebar-bg); color: #fff; padding: 11px 20px; border-radius: 10px; font-size: .83rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 9999; transform: translateY(60px); opacity: 0; transition: all .3s cubic-bezier(.34,1.56,.64,1); }
     .toast.show { transform: translateY(0); opacity: 1; }
-    @media (max-width:900px) { .appt-card-body { grid-template-columns:1fr; gap:1.5rem; } .appt-details { border:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.25rem 0; } .appt-actions-col { flex-direction:row; flex-wrap:wrap; } .btn { width:auto; } .stats-row { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:900px) { .appt-card-body { grid-template-columns:1fr; gap:1.5rem; } .appt-details { border:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:1.25rem 0; } .appt-actions-col { flex-direction:row; flex-wrap:wrap; } .btn { width:auto; } }
     @media (max-width:760px) { .main { padding:1.5rem 1.25rem; } .topnav { padding:0 1rem; } .pg-header h1 { font-size:1.5rem; } .nav-tabs { display:none; } }
   </style>
 </head>
@@ -161,7 +153,7 @@
 
   <!-- HEADER -->
   <div class="pg-header">
-    <h1>Good morning, <em>Dr. {{ user.get_full_name }}</em> 👨‍⚕️</h1>
+    <h1>Welcome, <em>Dr. {{ user.get_full_name }}</em> 👨‍⚕️</h1>
     <p>{{ user.doctor_profile.specialization }} &nbsp;·&nbsp; {% now "l, d M Y" %} &nbsp;·&nbsp; Session: {{ user.doctor_profile.session_duration }} min</p>
   </div>
 
@@ -172,41 +164,41 @@
     <section>
       <div class="sec-head">
         Today's Queue
-        <span>Ordered by check-in time</span>
+        <span>Ordered by appointment time</span>
       </div>
 
       {% if today_queue %}
         {% for appt in today_queue %}
-        <div class="appt-card">
+        <div class="appt-card {% if appt.status == 'completed' %}dimmed{% endif %}">
 
           <!-- Band -->
           <div class="appt-card-band">
             <div class="appt-band-left">
               <div class="appt-date-badge">
                 <div class="day">{{ appt.slot.start_time|date:"d" }}</div>
-                <div class="mon">{{ appt.slot.end_time|date:"M" }}</div>
+                <div class="mon">{{ appt.slot.start_time|date:"M" }}</div>
               </div>
               <div class="appt-band-title">
                 <h3>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</h3>
                 <p>
-                  {% if appt.checked_in_at %}
-                    Checked in at {{ appt.checked_in_at|date:"g:i A" }} &nbsp;·&nbsp;
+                  {% if appt.check_in_at %}
+                    Checked in at {{ appt.check_in_at|date:"g:i A" }} &nbsp;·&nbsp;
                   {% else %}
-                    Appointment at {{ appt.slot.start_datetime|date:"g:i A" }} &nbsp;·&nbsp;
+                    Appointment at {{ appt.slot.start_time|date:"g:i A" }} &nbsp;·&nbsp;
                   {% endif %}
                   #{{ forloop.counter }} in queue
                 </p>
               </div>
             </div>
             <div class="band-right">
-              {% if appt.checked_in_at %}
-                {% with wait=appt.wait_minutes %}
-                  <span class="wait-pill {% if wait >= 20 %}wait-long{% elif wait >= 10 %}wait-medium{% else %}wait-short{% endif %}">
-                    ⏱ {{ wait }}m waiting
-                  </span>
-                {% endwith %}
+              {% if appt.check_in_at %}
+                  <span class="wait-pill" 
+                    id="wait-{{ appt.id }}"
+                    data-checkin="{{ appt.check_in_at|date:'c' }}">
+                ⏱ <span class="wait-mins">--</span>m waiting
+              </span>
               {% else %}
-                <span class="wait-pill wait-short">⏱ Not yet</span>
+                <span class="wait-pill wait-short">⏱ Not yet checked in</span>
               {% endif %}
               <span class="status-badge s-{{ appt.status|lower }}">
                 <span class="sbadge-dot"></span>
@@ -218,7 +210,7 @@
           <!-- Body -->
           <div class="appt-card-body">
 
-            <!-- Patient -->
+            <!-- Patient info -->
             <div class="pat-col">
               <div class="pat-avatar">
                 {{ appt.patient.first_name|first|upper }}{{ appt.patient.last_name|first|upper }}
@@ -230,7 +222,7 @@
                     <strong>Age</strong>: {{ appt.patient.patient_profile.date_of_birth|timesince }}
                   {% endif %}
                 </div>
-                <div class="pat-meta"> <strong>Gender</strong>: {{ appt.patient.patient_profile.gender }}</div>
+                <div class="pat-meta"><strong>Gender</strong>: {{ appt.patient.patient_profile.gender }}</div>
                 <div class="pat-meta"><strong>Phone</strong>: {{ appt.patient.phone_number }}</div>
               </div>
             </div>
@@ -244,6 +236,59 @@
                   {{ appt.slot.start_time|date:"g:i A" }}
                 </span>
               </div>
+              <div class="detail-item">
+                <label>End Time</label>
+                <span>
+                  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+                  {{ appt.slot.end_time|date:"g:i A" }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <label>Status</label>
+                <span>{{ appt.get_status_display }}</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="appt-actions-col">
+
+              {% if appt.status == 'checked_in' %}
+                {# Patient is checked in — doctor can fill consultation then complete #}
+                
+                <form method="POST" action="{% url 'create_consultation' appt.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-green">  📝 Fill Consultation</button>
+                </form>
+
+                <form method="POST" action="{% url 'create_consultation' appt.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-green">  Mark as completed</button>
+                </form>
+
+              {% elif appt.status == 'confirmed' %}
+                {# Patient is confirmed but not yet checked in #}
+                <form method="POST" action="{% url 'dashboard:checkin' appt.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-green">✓ Check In</button>
+                </form>
+                <button
+                  class="btn btn-red">
+                  Mark No Show
+                </button>
+
+              {% elif appt.status == 'completed' %}
+                {# Appointment is done — show record link only #}
+                <a href="{% url 'medical:view_consultation' appt.id %}" class="btn btn-ghost">
+                  👁 View Record
+                </a>
+
+              {% elif appt.status == 'no_show' %}
+                <span class="btn btn-ghost" style="cursor:default; opacity:.6;">No Show</span>
+
+              {% endif %}
+
+            </div>
+
           </div>
         </div>
         {% endfor %}
@@ -259,89 +304,7 @@
   </div>
 
   <!-- ═══════════════════════════
-       TAB 2 · PENDING REQUESTS
-  ═══════════════════════════ -->
-  <div id="tab-requests" class="tab-panel">
-    <section>
-      <div class="sec-head">
-        Pending Requests
-        <span>Patients awaiting your confirmation</span>
-      </div>
-
-      {% if pending_requests %}
-        {% for appt in pending_requests %}
-        <div class="appt-card">
-
-          <!-- Band -->
-          <div class="appt-card-band">
-            <div class="appt-band-left">
-              <div class="appt-date-badge">
-                <div class="day">{{ appt.slot.start_datetime|date:"d" }}</div>
-                <div class="mon">{{ appt.slot.start_datetime|date:"M" }}</div>
-              </div>
-              <div class="appt-band-title">
-                <h3>{{ appt.patient.user.get_full_name }}</h3>
-                <p>Requested {{ appt.created_at|date:"d M" }} · {{ appt.slot.start_datetime|date:"D d M" }} at {{ appt.slot.start_datetime|date:"g:i A" }}</p>
-              </div>
-            </div>
-            <span class="status-badge s-requested">
-              <span class="sbadge-dot"></span> Requested
-            </span>
-          </div>
-
-          <!-- Body -->
-          <div class="appt-card-body">
-
-            <div class="pat-col">
-              <div class="pat-avatar">
-                {{ appt.patient.user.first_name|first|upper }}{{ appt.patient.user.last_name|first|upper }}
-              </div>
-              <div>
-                <div class="pat-name">{{ appt.patient.user.get_full_name }}</div>
-                <div class="pat-meta">
-                  {% if appt.patient.gender == 'M' %}Male{% elif appt.patient.gender == 'F' %}Female{% endif %}
-                </div>
-                <div class="pat-meta">{{ appt.patient.phone }}</div>
-              </div>
-            </div>
-
-            <div class="appt-details">
-              <div class="detail-item">
-                <label>Date & Time</label>
-                <span>
-                  <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-                  {{ appt.slot.start_datetime|date:"d M · g:i A" }}
-                </span>
-              </div>
-              <div class="detail-item">
-                <label>Reason</label>
-                <span>{{ appt.reason|default:"Not provided" }}</span>
-              </div>
-              <div class="detail-item">
-                <label>Session</label>
-                <span>{{ doctor_profile.session_duration }} min</span>
-              </div>
-              <div class="detail-item">
-                <label>Requested On</label>
-                <span>{{ appt.created_at|date:"d M Y" }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-
-      {% else %}
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-          <p>No pending requests. You're all caught up!</p>
-        </div>
-      {% endif %}
-
-    </section>
-  </div>
-
-  <!-- ═══════════════════════════
-       TAB 3 · COMPLETED
+       TAB 2 · COMPLETED
   ═══════════════════════════ -->
   <div id="tab-completed" class="tab-panel">
     <section>
@@ -350,70 +313,63 @@
         <span>{{ stats.completed_today }} session{% if stats.completed_today != 1 %}s{% endif %} done</span>
       </div>
 
-      {% with completed=today_queue|dictsort:"slot.start_datetime" %}
-        {% for appt in today_queue %}
-          {% if appt.status == 'COMPLETED' %}
-          <div class="appt-card dimmed">
+      {% for appt in today_queue %}
+        {% if appt.status == 'completed' %}
+        <div class="appt-card dimmed">
 
-            <div class="appt-card-band">
-              <div class="appt-band-left">
-                <div class="appt-date-badge">
-                  <div class="day">{{ appt.slot.start_datetime|date:"d" }}</div>
-                  <div class="mon">{{ appt.slot.start_datetime|date:"M" }}</div>
-                </div>
-                <div class="appt-band-title">
-                  <h3>{{ appt.patient.user.get_full_name }}</h3>
-                  <p>Completed · {{ appt.slot.start_datetime|date:"g:i A" }}</p>
-                </div>
+          <div class="appt-card-band">
+            <div class="appt-band-left">
+              <div class="appt-date-badge">
+                <div class="day">{{ appt.slot.start_time|date:"d" }}</div>
+                <div class="mon">{{ appt.slot.start_time|date:"M" }}</div>
               </div>
-              <span class="status-badge s-completed">
-                <span class="sbadge-dot"></span> Completed
-              </span>
-            </div>
-
-            <div class="appt-card-body">
-              <div class="pat-col">
-                <div class="pat-avatar">
-                  {{ appt.patient.user.first_name|first|upper }}{{ appt.patient.user.last_name|first|upper }}
-                </div>
-                <div>
-                  <div class="pat-name">{{ appt.patient.user.get_full_name }}</div>
-                  <div class="pat-meta">
-                    {% if appt.patient.gender == 'M' %}Male{% elif appt.patient.gender == 'F' %}Female{% endif %}
-                  </div>
-                </div>
-              </div>
-
-              <div class="appt-details">
-                <div class="detail-item">
-                  <label>Time</label>
-                  <span>{{ appt.slot.start_datetime|date:"g:i A" }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>Reason</label>
-                  <span>{{ appt.reason|default:"—" }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>Duration</label>
-                  <span>{{ doctor_profile.session_duration }} min</span>
-                </div>
-                {% if appt.consultation %}
-                <div class="detail-item">
-                  <label>Diagnosis</label>
-                  <span>{{ appt.consultation.diagnosis|default:"—"|truncatechars:30 }}</span>
-                </div>
-                {% endif %}
-              </div>
-
-              <div class="appt-actions-col">
-                <a href="{% url 'medical:view_consultation' appt.id %}" class="btn btn-ghost">👁 View Record</a>
+              <div class="appt-band-title">
+                <h3>{{ appt.patient.get_full_name }}</h3>
+                <p>Completed · {{ appt.slot.start_time|date:"g:i A" }}</p>
               </div>
             </div>
-
+            <span class="status-badge s-completed">
+              <span class="sbadge-dot"></span> Completed
+            </span>
           </div>
-          {% endif %}
-        {% endfor %}
-      {% endwith %}
+
+          <div class="appt-card-body">
+            <div class="pat-col">
+              <div class="pat-avatar">
+                {{ appt.patient.first_name|first|upper }}{{ appt.patient.last_name|first|upper }}
+              </div>
+              <div>
+                <div class="pat-name">{{ appt.patient.get_full_name }}</div>
+                <div class="pat-meta"><strong>Gender</strong>: {{ appt.patient.patient_profile.gender }}</div>
+                <div class="pat-meta"><strong>Phone</strong>: {{ appt.patient.phone_number }}</div>
+              </div>
+            </div>
+
+            <div class="appt-details">
+              <div class="detail-item">
+                <label>Time</label>
+                <span>{{ appt.slot.start_time|date:"g:i A" }} – {{ appt.slot.end_time|date:"g:i A" }}</span>
+              </div>
+              <div class="detail-item">
+                <label>Duration</label>
+                <span>{{ user.doctor_profile.session_duration }} min</span>
+              </div>
+              {% if appt.consultation %}
+              <div class="detail-item">
+                <label>Diagnosis</label>
+                <span>{{ appt.consultation.diagnosis|default:"—"|truncatechars:30 }}</span>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="appt-actions-col">
+              <a href="{% url 'medical:view_consultation' appt.id %}" class="btn btn-ghost">👁 View Record</a>
+            </div>
+          </div>
+
+        </div>
+        {% endif %}
+      {% endfor %}
 
       {% if stats.completed_today == 0 %}
         <div class="empty-state">
@@ -466,43 +422,10 @@
   </div>
 </div>
 
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
-
-<script>
-  function switchTab(name, btn) {
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + name).classList.add('active');
-    btn.classList.add('active');
-  }
-
-  // pass appointment id so the form POSTs to the right URL
-  function openModal(id, name, apptId) {
-    if (id === 'noShowModal') {
-      document.getElementById('noshow-name').textContent = name;
-      document.getElementById('noShowForm').action = `/dashboard/appointment/${apptId}/no-show/`;
-    }
-    if (id === 'declineModal') {
-      document.getElementById('decline-name').textContent = name;
-      document.getElementById('declineForm').action = `/dashboard/appointment/${apptId}/decline/`;
-    }
-    document.getElementById(id).classList.add('open');
-  }
-
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('open');
-  }
-
-  document.querySelectorAll('.modal-overlay').forEach(o => {
-    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
-  });
-
-  function showToast(msg, icon) {
-    const t = document.getElementById('toast');
-    t.textContent = (icon || '✅') + '  ' + msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
-</script>
+<script src="{% static 'js/wait_timer.js' %}"></script>
+<script src="{% static 'js/utils.js' %}"></script>
 </body>
 </html>
