@@ -40,7 +40,12 @@
         <li>No tests requested</li>
         {% endfor %}
     </ul>
+
     <a href="{% url 'consultation_edit' object.id %}">Edit Consultation</a>
+    <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">finish consultation</a>
+
+
+
 </body>
 
 </html>
