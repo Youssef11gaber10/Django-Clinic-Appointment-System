@@ -38,7 +38,7 @@ def consultation_create(request, appointment_id):
             consultation = form.save(commit=False)
             consultation.appointment = appointment
             consultation.save()
-            return redirect("consultation-detail", pk=consultation.pk)
+            return redirect("consultation_detail", pk=consultation.pk)
     else:
         form = ConsultationForm()
 

@@ -3,7 +3,8 @@
 # slots heavy logic
 
 from datetime import date, datetime, timedelta
-from .models import Availability, Slot, Appointment, RescheduleHistory, DoctorException
+from .models import Availability, Slot, DoctorException
+from appointments.models import Appointment , RescheduleHistory
 
 # get the days available between the start date and end date of the doctor
 def get_days_between(start_date, end_date):
