@@ -11,4 +11,5 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('scheduling/', include('scheduling.urls')),
     path('medical/',include('medical.urls')),
+    path('appointments/', include('appointments.urls'))
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
