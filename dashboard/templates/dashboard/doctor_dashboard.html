@@ -36,7 +36,7 @@
 
       {% if today_queue %}
         {% for appt in today_queue %}
-          {% include "dashboard/appt_card.html" with appt=appt show_queue=True loop_counter=forloop.counter %}
+          {% include "dashboard/appt_card_doctor.html" with appt=appt show_queue=True loop_counter=forloop.counter %}
         {% endfor %}
       {% else %}
         <div class="empty-state">
@@ -62,7 +62,7 @@
 
       {% if compiled_appointments %}
         {% for appt in compiled_appointments %}
-          {% include "dashboard/appt_card.html" with appt=appt %}
+          {% include "dashboard/appt_card_doctor.html" with appt=appt %}
         {% endfor %}
       {% else %}
         <div class="empty-state">

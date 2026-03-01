@@ -90,7 +90,7 @@ def patient_dashboard(request):
         })
     
     context = {
-        "upcoming_appointments":  appointments_with_info,
+        "upcoming_appointments":  upcoming_appointments,
         "previous_appointments":  previous_appointments
     }
     return render(request, "dashboard/patient_dashboard.html", context)

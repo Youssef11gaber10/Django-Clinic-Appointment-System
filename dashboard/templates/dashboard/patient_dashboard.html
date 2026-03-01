@@ -1,529 +1,78 @@
+{% extends "dashboard/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patient Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg:          #f5f3ef;
-      --surface:     #ffffff;
-      --sidebar-bg:  #1a1a2e;
-      --sidebar-hover: #ffffff12;
-      --sidebar-act: #ffffff1f;
-      --accent:      #c8a97e;
-      --accent2:     #6a9fb5;
-      --text:        #1c1c1c;
-      --muted:       #7a7a7a;
-      --border:      #e5e2da;
-      --success:     #6abf8a;
-      --danger:      #e07070;
-      --radius:      14px;
-      --shadow:      0 4px 24px rgba(0,0,0,.07);
-      --nav-h:       64px;
-    }
+{% block title %}Patient Portal · MediCare{% endblock %}
 
-    html { scroll-behavior: smooth; }
+{% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      font-size: 15px; line-height: 1.55;
-    }
+{% block nav_tabs %}
+  <button class="nav-tab active" onclick="switchTab('upcoming', this)">
+    Upcoming
+    <span class="tab-count">{{ upcoming_appointments|length }}</span>
+  </button>
+  <button class="nav-tab" onclick="switchTab('previous', this)">
+    Previous
+    <span class="tab-count">{{ previous_appointments|length }}</span>
+  </button>
+{% endblock %}
 
-    /* ── TOP NAV ── */
-    .topnav {
-      position: sticky; top: 0; z-index: 100;
-      height: var(--nav-h);
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 2rem;
-      box-shadow: 0 1px 8px rgba(0,0,0,.04);
-    }
-    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
-    .brand-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: var(--sidebar-bg);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .brand-icon svg { width: 18px; height: 18px; fill: var(--accent); }
-    .brand-name { font-family: 'DM Serif Display', serif; font-size: 1.2rem; }
+{% block extra_styles %}
+<style>
+  /* Patient-only additions */
+  .appt-card.previous .appt-card-band { background: #3a3a4a; }
+  .appt-card.previous .appt-card-body { opacity: .85; }
+  .doc-col { display: flex; align-items: center; gap: .9rem; min-width: 190px; }
+</style>
+{% endblock %}
 
-    /* ── NAV TABS ── */
-    .nav-tabs {
-      display: flex; align-items: center; gap: .25rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 3px;
-    }
-    .nav-tab {
-      padding: 6px 18px; border-radius: 7px;
-      font-size: .83rem; font-weight: 500;
-      cursor: pointer; border: none; background: transparent;
-      color: var(--muted); font-family: inherit;
-      transition: all .15s;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .nav-tab:hover { color: var(--text); }
-    .nav-tab.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-    }
-    .nav-tab .tab-count {
-      background: var(--accent);
-      color: #fff;
-      font-size: .67rem; font-weight: 700;
-      padding: 1px 6px; border-radius: 10px;
-      line-height: 1.4;
-    }
-    .nav-tab.active .tab-count { background: var(--sidebar-bg); }
+{% block content %}
 
-    .nav-right { display: flex; align-items: center; gap: 1rem; }
-    .nav-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 600; font-size: .82rem; color: #fff;
-    }
-    .logout {
-      font-size: .83rem; color: var(--muted); text-decoration: none;
-      padding: 6px 14px; border: 1px solid var(--border); border-radius: 8px;
-      transition: all .18s;
-    }
-    .logout:hover { background: var(--bg); color: var(--text); }
-
-    /* ── SHELL ── */
-    .shell { display: flex; flex: 1; }
-
-    /* ── MAIN ── */
-    .main {
-      flex: 1; padding: 2.5rem 2.5rem 4rem; min-width: 0;
-      animation: fadeUp .42s ease both;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .pg-header { margin-bottom: 2rem; }
-    .pg-header h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2rem; line-height: 1.2; font-weight: 400;
-    }
-    .pg-header h1 em { font-style: italic; color: var(--accent); }
-    .pg-header p { margin-top: .3rem; color: var(--muted); font-size: .88rem; }
-
-    /* ── TAB PANELS ── */
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; animation: fadeUp .3s ease both; }
-
-    /* ── SECTION ── */
-    section { margin-bottom: 2.5rem; }
-    .sec-head {
-      font-family: 'DM Serif Display', serif; font-size: 1.22rem; font-weight: 400;
-      margin-bottom: 1rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    /* ── APPOINTMENT CARD ── */
-    .appt-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); box-shadow: var(--shadow);
-      overflow: hidden; width: 100%;
-      margin-bottom: 1.25rem;
-    }
-
-    /* Dark header band */
-    .appt-card-band {
-      background: var(--sidebar-bg);
-      padding: 1.2rem 1.75rem;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .appt-band-left { display: flex; align-items: center; gap: 1.1rem; }
-    .appt-date-badge {
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 10px;
-      padding: .65rem 1rem; text-align: center;
-      min-width: 56px; flex-shrink: 0; color: #fff;
-    }
-    .appt-date-badge .day {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.7rem; line-height: 1;
-    }
-    .appt-date-badge .mon {
-      font-size: .63rem; text-transform: uppercase;
-      letter-spacing: .1em; color: var(--accent); margin-top: 2px;
-    }
-    .appt-band-title { color: #fff; }
-    .appt-band-title h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.1rem; font-weight: 400;
-    }
-    .appt-band-title p { font-size: .8rem; color: #ffffff70; margin-top: 2px; }
-
-    /* Status badge */
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 4px 12px; border-radius: 20px;
-      font-size: .75rem; font-weight: 600; text-transform: capitalize;
-      flex-shrink: 0;
-    }
-    .s-requested  { background: #fdf3e0; color: #8a5e00; }
-    .s-confirmed  { background: #e3f1f7; color: #1a6180; }
-    .s-checked_in { background: #e8f5ec; color: #2e7d4f; }
-    .s-completed  { background: #eaf5ee; color: #2e7d4f; }
-    .s-cancelled  { background: #fde8e8; color: #8a0000; }
-    .sbadge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-    /* Card body */
-    .appt-card-body {
-      padding: 1.5rem 1.75rem;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 2rem;
-      align-items: start;
-    }
-
-    /* Doctor column */
-    .doc-col { display: flex; align-items: center; gap: .9rem; min-width: 190px; }
-
-    /* Details grid */
-    .appt-details {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 1rem;
-      border-left: 1px solid var(--border);
-      border-right: 1px solid var(--border);
-      padding: 0 1.75rem;
-    }
-    .detail-item label {
-      display: block; font-size: .67rem; text-transform: uppercase;
-      letter-spacing: .09em; color: var(--muted); margin-bottom: 3px;
-    }
-    .detail-item span {
-      font-size: .88rem; font-weight: 500; color: var(--text);
-      display: flex; align-items: center; gap: 5px;
-    }
-    .detail-item span svg { width: 13px; height: 13px; fill: var(--accent2); flex-shrink: 0; }
-
-    /* Actions column */
-    .appt-actions-col { display: flex; flex-direction: column; gap: .5rem; min-width: 120px; }
-    .btn {
-      padding: 7px 16px; border-radius: 8px; font-size: .8rem;
-      font-weight: 500; cursor: pointer; border: none; font-family: inherit;
-      transition: all .14s; text-align: center; width: 100%;
-    }
-    .btn-dark  { background: var(--sidebar-bg); color: #fff; }
-    .btn-dark:hover  { background: #2e2e4a; }
-    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-ghost:hover { background: var(--bg); }
-    .btn-red   { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
-    .btn-red:hover   { background: #fdf0f0; }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      background: var(--surface); border: 1px dashed var(--border);
-      border-radius: var(--radius); padding: 3rem 2rem;
-      text-align: center; color: var(--muted);
-    }
-    .empty-state svg { width: 40px; height: 40px; fill: var(--border); display: block; margin: 0 auto .75rem; }
-    .empty-state p { font-size: .88rem; }
-    .empty-state a {
-      display: inline-block; margin-top: .85rem;
-      font-size: .83rem; color: var(--accent2); text-decoration: none; font-weight: 500;
-    }
-
-    /* ── PREVIOUS — dimmed style ── */
-    .appt-card.previous .appt-card-band { background: #3a3a4a; }
-    .appt-card.previous .appt-card-body { opacity: .85; }
-
-    @media (max-width: 900px) {
-      .appt-card-body { grid-template-columns: 1fr; gap: 1.5rem; }
-      .appt-details { border: none; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
-      .appt-actions-col { flex-direction: row; flex-wrap: wrap; }
-      .btn { width: auto; }
-    }
-    @media (max-width: 760px) {
-      .main { padding: 1.5rem 1.25rem; }
-      .topnav { padding: 0 1rem; }
-      .pg-header h1 { font-size: 1.5rem; }
-      .nav-tabs { display: none; }
-    }
-  </style>
-</head>
-<body>
-
-<!-- ── TOP NAV ── -->
-<nav class="topnav">
-  <a class="brand" href="{% url 'patient_dashboard' %}">
-    <div class="brand-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z"/></svg>
-    </div>
-    <span class="brand-name">MediCare</span>
-  </a>
-
-  <!-- Tab switcher -->
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="switchTab('upcoming', this)">
-      Upcoming
-      <span class="tab-count">{{ upcoming_appointments|length }}</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('previous', this)">
-      Previous
-      <span class="tab-count">{{ previous_appointments|length }}</span>
-    </button>
+  <!-- ── Page header ── -->
+  <div class="pg-header">
+    <h1>Welcome, <em>{{ user.first_name }} {{ user.last_name }}</em> 👋</h1>
+    <p>Here's a summary of your health activity.</p>
   </div>
 
-<div class="nav-right">
-  <a href="{% url 'profile' %}" class="nav-avatar">
-    {{ user.username|first|upper }}
-  </a>
+  <!-- ══════════════════════════════
+       TAB 1 · UPCOMING
+  ══════════════════════════════ -->
+  <div id="tab-upcoming" class="tab-panel active">
+    <section>
+      <div class="sec-head">Upcoming Appointments</div>
 
-</div>
-</nav>
+      {% if upcoming_appointments %}
+        {% for appt in upcoming_appointments %}
 
-<div class="shell">
-  <main class="main">
-
-    <div class="pg-header">
-      <h1>Welcome, <em>{{ user.first_name }} {{ user.last_name }}</em> 👋</h1>
-      <p>Here's a summary of your health activity.</p>
-    </div>
-
-    <!-- ── UPCOMING TAB ── -->
-    <div id="tab-upcoming" class="tab-panel active">
-      <section>
-        <div class="sec-head">Upcoming Appointments</div>
-
-        {% if upcoming_appointments %}
-          {% for appt in upcoming_appointments %}
-          <div class="appt-card">
-
-            <!-- Band -->
-            <div class="appt-card-band">
-              <div class="appt-band-left">
-                <div class="appt-date-badge">
-                  <div class="day">{{ appt.created_at|slice:"8:10" }}</div>
-                  <div class="mon">
-                    {% with m=appt.created_at|slice:"5:7" %}
-                      {% if m == "01" %}Jan{% elif m == "02" %}Feb{% elif m == "03" %}Mar
-                      {% elif m == "04" %}Apr{% elif m == "05" %}May{% elif m == "06" %}Jun
-                      {% elif m == "07" %}Jul{% elif m == "08" %}Aug{% elif m == "09" %}Sep
-                      {% elif m == "10" %}Oct{% elif m == "11" %}Nov{% else %}Dec{% endif %}
-                    {% endwith %}
-                  </div>
-                </div>
-                <div class="appt-band-title">
-                  <h3>Dr. {{ appt.doctor.doctor_profile.username }} {{ appt.doctor.user.last_name }}</h3>
-                  <p>{{ appt.doctor.specialization }}</p>
-                </div>
-              </div>
-              <span class="status-badge s-{{ appt.status }}">
-                <span class="sbadge-dot"></span>
-                {{ appt.status|title }}
-              </span>
-            </div>
-
-            <!-- Body -->
-            <div class="appt-card-body">
-
-              <!-- Doctor -->
-              <div class="doc-col">
-                <div class="doc-avatar">
-                  <img src="{% static 'images/default_doctor.jpg' %}" width="100px" alt="Doctor" onerror="this.style.display='none'">
-                </div>
-                <div>
-                  <div class="doc-name">Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</div>
-                  <div class="doc-spec">{{ appt.doctor.specialization }}</div>
-                  <div class="doc-bio">{{ appt.doctor.bio }}</div>
-                </div>
-              </div>
-
-              <!-- Details -->
-              <div class="appt-details">
-                <div class="detail-item">
-                  <label>Date</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-                    {{ appt.created_at|slice:":10" }}
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Time</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
-                    {{ appt.created_at|slice:"11:16" }}
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Session Duration</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-                    {{ appt.doctor.session_duration }} min
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Status</label>
-                  <span>{{ appt.status|title }}</span>
-                </div>
-                <div class="detail-item">
-                  <label>Doctor Email</label>
-                  <span>{{ appt.doctor.user.email }}</span>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="appt-actions-col">
-                cancel
-              </div>
-
-            </div>
-          </div>
-          {% endfor %}
-
-        {% else %}
+          {% include "dashboard/appt_card_patient.html" with appt=appt is_previous=False %}
+        {% endfor %}
+      {% else %}
         <div class="empty-state">
           <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
           <p>You have no upcoming appointments.</p>
           <a href="#">Book an appointment →</a>
         </div>
-        {% endif %}
+      {% endif %}
+    </section>
+  </div>
 
-      </section>
-    </div>
+  <!-- ══════════════════════════════
+       TAB 2 · PREVIOUS
+  ══════════════════════════════ -->
+  <div id="tab-previous" class="tab-panel">
+    <section>
+      <div class="sec-head">Previous Appointments</div>
 
-    <!-- ── PREVIOUS TAB ── -->
-    <div id="tab-previous" class="tab-panel">
-      <section>
-        <div class="sec-head">Previous Appointments</div>
-
-        {% if previous_appointments %}
-          {% for appt in previous_appointments %}
-          <div class="appt-card previous">
-
-            <!-- Band -->
-            <div class="appt-card-band">
-              <div class="appt-band-left">
-                <div class="appt-date-badge">
-                  <div class="day">{{ appt.created_at|slice:"8:10" }}</div>
-                  <div class="mon">
-                    {% with m=appt.created_at|slice:"5:7" %}
-                      {% if m == "01" %}Jan{% elif m == "02" %}Feb{% elif m == "03" %}Mar
-                      {% elif m == "04" %}Apr{% elif m == "05" %}May{% elif m == "06" %}Jun
-                      {% elif m == "07" %}Jul{% elif m == "08" %}Aug{% elif m == "09" %}Sep
-                      {% elif m == "10" %}Oct{% elif m == "11" %}Nov{% else %}Dec{% endif %}
-                    {% endwith %}
-                  </div>
-                </div>
-                <div class="appt-band-title">
-                  <h3>Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</h3>
-                  <p>{{ appt.doctor.specialization }} </p>
-                </div>
-              </div>
-              <span class="status-badge s-{{ appt.status }}">
-                <span class="sbadge-dot"></span>
-                {{ appt.status|title }}
-              </span>
-            </div>
-
-            <!-- Body -->
-            <div class="appt-card-body">
-
-              <!-- Doctor -->
-              <div class="doc-col">
-                  <img src="{% static 'images/default_doctor.jpg' %}" width="100px" alt="Doctor" onerror="this.style.display='none'">
-                <div>
-                  <div class="doc-name">Dr. {{ appt.doctor.user.first_name }} {{ appt.doctor.user.last_name }}</div>
-                  <div class="doc-spec">{{ appt.doctor.specialization }}</div>
-                  <div class="doc-bio">{{ appt.doctor.bio }}</div>
-                </div>
-              </div>
-
-              <!-- Details -->
-              <div class="appt-details">
-                <div class="detail-item">
-                  <label>Date</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-                    {{ appt.created_at|slice:":10" }}
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Time</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
-                    {{ appt.created_at|slice:"11:16" }}
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Session Duration</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
-                    {{ appt.doctor.session_duration }} min
-                  </span>
-                </div>
-                <div class="detail-item">
-                  <label>Status</label>
-                  <span>{{ appt.status|title }}</span>
-                </div>
-                {% if appt.check_in_at %}
-                <div class="detail-item">
-                  <label>Checked In</label>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
-                    {{ appt.check_in_at|slice:":16" }}
-                  </span>
-                </div>
-                {% endif %}
-                <div class="detail-item">
-                  <label>Doctor Email</label>
-                  <span>{{ appt.doctor.user.email }}</span>
-                </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="appt-actions-col">
-                <button class="btn btn-dark">View Details</button>
-              </div>
-
-            </div>
-          </div>
-          {% endfor %}
-
-        {% else %}
+      {% if previous_appointments %}
+        {% for appt in previous_appointments %}
+          {% include "dashboard/appt_card_patient.html" with appt=appt is_previous=True %}
+        {% endfor %}
+      {% else %}
         <div class="empty-state">
           <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
           <p>No previous appointments found.</p>
         </div>
-        {% endif %}
+      {% endif %}
+    </section>
+  </div>
 
-      </section>
-    </div>
-
-  </main>
-</div>
-
-<script>
-  function switchTab(name, btn) {
-    // hide all panels
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-    // deactivate all tab buttons
-    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
-    // show selected
-    document.getElementById('tab-' + name).classList.add('active');
-    btn.classList.add('active');
-  }
-</script>
-</body>
-</html>
+{% endblock %}

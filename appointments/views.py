@@ -23,7 +23,7 @@ def cancel_appointment(request, appointment_id):
         messages.success(request, "Appointment cancelled successfully.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("")
+    return redirect("patient_dashboard")
 
 
 def confirm_appointment(request, appointment_id):
