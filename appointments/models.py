@@ -1,11 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.db import transaction , IntegrityError
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ValidationError, ObjectDoesNotExist , PermissionDenied
 from django.db.models import Q
 from django.utils import timezone
-
 from scheduling.models import Slot
+
 # Create your models here.
 class Appointment(models.Model):
     slot = models.ForeignKey(Slot , on_delete=models.CASCADE , related_name="appointments")
@@ -44,14 +44,16 @@ class Appointment(models.Model):
     
     @transaction.atomic
     @classmethod
-    def request_appointment(cls , slot , patient):
+    def request_appointment(cls , slot , user):
+        if user.role != "patient":
+            raise ValidationError("Only patients can book appointments.")
         active_statuses = [
         cls.REQUESTED,
         cls.CONFIRMED,
         cls.CHECKED_IN,
     ]
         overlapping_exists = cls.objects.filter(
-        patient=patient,
+        patient=user,
         status__in=active_statuses,
         slot__start_time__lt=slot.end_time,
         slot__end_time__gt=slot.start_time,
@@ -66,7 +68,8 @@ class Appointment(models.Model):
         try:
             appointment = cls.objects.create(
             slot=slot,
-            patient=patient,
+            patient=user,
+            doctor = slot.doctor
             )
             slot.is_available = False
             slot.save()
@@ -75,7 +78,9 @@ class Appointment(models.Model):
               raise ValidationError("This slot has been booked by someone else.")
         
     @transaction.atomic
-    def confirm_appointment(self):
+    def confirm_appointment(self , user):
+        if user.role != "receptionist":
+            raise PermissionDenied("Only receptionists can confirm the appointment.")
         if self.status != self.REQUESTED:
             raise ValidationError("Only appointments with status REQUESTED can be confirmed.")
         self.status = self.CONFIRMED
@@ -83,7 +88,11 @@ class Appointment(models.Model):
 
     
     @transaction.atomic
-    def cancel_appointment(self):
+    def cancel_appointment(self, user):
+        if user.role != "patient":
+            raise PermissionDenied("Only patient can cancel the appointment.")
+        if self.patient != user:
+            raise PermissionDenied("You can only cancel your own appointment.")
         if self.status not in [self.REQUESTED , self.CONFIRMED]:
             raise ValidationError("Appointment cannot be cancelled in its current status.")
         self.status = self.CANCELLED
@@ -93,16 +102,19 @@ class Appointment(models.Model):
 
 
     @transaction.atomic
-    def check_in_appointment(self):
+    def check_in_appointment(self, user):
+        if user.role != "receptionist":
+            raise PermissionDenied("Only receptionists can check in the appointment.")
         if self.status != self.CONFIRMED:
             raise ValidationError("Only confirmed appointments can be checked in.")
-        # now = timezone.now()
+        self.check_in_at = timezone.now()
         self.status = self.CHECKED_IN
-        # self.check_in_at = now
         self.save()
 
     @transaction.atomic
-    def mark_no_show(self):
+    def mark_no_show(self , user):
+        if user.role not in ["receptionist" , "doctor"]:
+            raise PermissionDenied("Only receptionist or doctor can mark the appointment.")
         if self.status != self.CONFIRMED:
             raise ValidationError("Only confirmed appointments can be marked as no show.")
         self.status = self.NO_SHOW
@@ -110,7 +122,9 @@ class Appointment(models.Model):
 
 
     @transaction.atomic
-    def complete_appointment(self):
+    def complete_appointment(self , user):
+        if user.role != "doctor":
+            raise PermissionDenied("Only doctor can complete the appointment.")
         if self.status != self.CHECKED_IN:
             raise ValidationError("only checked-in appointments can be completed.")
         try:

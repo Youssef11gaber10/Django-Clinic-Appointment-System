@@ -9,6 +9,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     # path('__debug__/' , include('debug_toolbar.urls')),
     path('dashboard/', include('dashboard.urls')),
-    path('scheduling/', include('scheduling.urls'))
+    path('scheduling/', include('scheduling.urls')),
     path('medical/',include('medical.urls')),
+    path('appointments/', include('appointments.urls'))
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
