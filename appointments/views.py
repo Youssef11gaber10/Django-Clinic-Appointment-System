@@ -33,7 +33,7 @@ def confirm_appointment(request, appointment_id):
         messages.success(request, "Appointment confirmed.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("")
+    return redirect("dashboard:recep_dashboard")
 
 
 def check_in_appointment(request, appointment_id):
