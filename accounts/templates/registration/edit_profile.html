@@ -1,65 +1,331 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Profile</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .form-group { margin: 15px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea, select { width: 100%; padding: 8px; margin-bottom: 10px; }
-        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        .error { color: red; }
-        .success { color: green; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile · MediCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #f5f3ef;
+      --surface:     #ffffff;
+      --sidebar-bg:  #1a1a2e;
+      --accent:      #c8a97e;
+      --accent2:     #6a9fb5;
+      --text:        #1c1c1c;
+      --muted:       #7a7a7a;
+      --border:      #e5e2da;
+      --success:     #6abf8a;
+      --danger:      #e07070;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(0,0,0,.07);
+      --nav-h:       64px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .topnav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      height: var(--nav-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-shadow: 0 1px 8px rgba(0,0,0,.04);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--sidebar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .nav-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: .82rem;
+      color: #fff;
+    }
+    .logout {
+      font-size: .83rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all .15s;
+    }
+    .logout:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+    .main {
+      flex: 1;
+      padding: 2.5rem 2.5rem 4rem;
+      max-width: 700px;
+      margin: 0 auto;
+      width: 100%;
+      animation: fadeUp .42s ease both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .pg-header {
+      margin-bottom: 2rem;
+    }
+    .pg-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1.2;
+      font-weight: 400;
+    }
+    .pg-header p {
+      margin-top: .3rem;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .messages {
+      margin-bottom: 1.5rem;
+    }
+    .message {
+      padding: 1rem 1.2rem;
+      border-radius: var(--radius);
+      border: 1px solid;
+    }
+    .message.success {
+      background: #e8f5ec;
+      color: #2e7d4f;
+      border-color: #b8dfc5;
+    }
+    .message.error {
+      background: #fde8e8;
+      color: #8a0000;
+      border-color: #f5b8b8;
+    }
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .form-section {
+      margin-bottom: 2rem;
+    }
+    .form-section:last-child {
+      margin-bottom: 0;
+    }
+    .form-section h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 500;
+      margin-bottom: .5rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .95rem;
+      color: var(--text);
+      background: #fafaf8;
+      transition: all .15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      background: var(--surface);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200, 169, 126, .08);
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder {
+      color: var(--muted);
+    }
+    .error {
+      color: #8a0000;
+      font-size: .8rem;
+      margin-top: .3rem;
+    }
+    .errorlist {
+      color: #8a0000;
+      list-style: none;
+      padding: 0;
+      margin-top: .3rem;
+      font-size: .8rem;
+    }
+    .errorlist li {
+      margin: 2px 0;
+    }
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all .15s;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .btn-primary {
+      background: var(--sidebar-bg);
+      color: #fff;
+      flex: 1;
+    }
+    .btn-primary:hover {
+      background: #2e2e4a;
+    }
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      flex: 1;
+    }
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Edit Profile</h1>
+  <div class="topnav">
+    <a href="#" class="brand">
+      <div class="brand-icon">⚕️</div>
+      <div class="brand-name">MediCare</div>
+    </a>
+    <div class="nav-right">
+      <div class="nav-avatar">U</div>
+      <a href="{% url 'logout' %}" class="logout">Logout</a>
+    </div>
+  </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="message {{ message.tags }}">
-                    <strong>{{ message }}</strong>
-                </div>
+  <div class="main">
+    <div class="pg-header">
+      <h1>Edit Profile</h1>
+      <p>Update your personal and account information</p>
+    </div>
+
+    {% if messages %}
+      <div class="messages">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">
+          <strong>{{ message }}</strong>
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="form-card">
+      <form method="post">
+        {% csrf_token %}
+
+        {% if user_form %}
+          <div class="form-section">
+            <h2>User Information</h2>
+            {% for field in user_form %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="errorlist">
+                  {% for error in field.errors %}
+                    <div class="error">{{ error }}</div>
+                  {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
             {% endfor %}
+          </div>
         {% endif %}
 
-        <form method="post">
-            {% csrf_token %}
-            
-            <h2>User Information</h2>
-            {% if user_form %}
-                {% for field in user_form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="error">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if profile_form %}
+          <div class="form-section">
+            <h2>Profile Information</h2>
+            {% for field in profile_form %}
+              <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div class="errorlist">
+                  {% for error in field.errors %}
+                    <div class="error">{{ error }}</div>
+                  {% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
 
-            <!-- Patient Profile Form -->
-            {% if profile_form %}
-                <h2>Patient Information</h2>
-                {% for field in profile_form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <div class="error">{{ field.errors }}</div>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <button type="submit">Update Profile</button>
-        </form>
-
-        <hr>
-        <a href="{% url 'profile' %}">Back to Profile</a>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Update Profile</button>
+          <a href="{% url 'profile' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
     </div>
+  </div>
 </body>
 </html>

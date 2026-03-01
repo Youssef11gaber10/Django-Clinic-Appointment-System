@@ -1,84 +1,278 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        .error { color: red; margin: 10px 0; }
-        .success { color: green; margin: 10px 0; }
-        .form-group { margin: 15px 0; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="email"], input[type="text"], input[type="password"] { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button { 
-            background-color: #007bff; 
-            color: white; 
-            padding: 10px 20px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover { background-color: #0056b3; }
-        .links { margin-top: 20px; text-align: center; }
-        .links a { margin: 0 10px; }
-        .errorlist { color: red; list-style: none; padding: 0; }
-        .errorlist li { margin: 5px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register as Patient · MediCare</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:          #f5f3ef;
+      --surface:     #ffffff;
+      --sidebar-bg:  #1a1a2e;
+      --accent:      #c8a97e;
+      --accent2:     #6a9fb5;
+      --text:        #1c1c1c;
+      --muted:       #7a7a7a;
+      --border:      #e5e2da;
+      --success:     #6abf8a;
+      --danger:      #e07070;
+      --radius:      14px;
+      --shadow:      0 4px 24px rgba(0,0,0,.07);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 500px;
+    }
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      animation: fadeUp .42s ease both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .auth-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .auth-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--sidebar-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 1.3rem;
+    }
+    .auth-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .auth-brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+    }
+    .auth-brand-sub {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .auth-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: .5rem;
+      font-weight: 400;
+    }
+    .auth-subtitle {
+      font-size: .88rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 500;
+      margin-bottom: .5rem;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .95rem;
+      color: var(--text);
+      background: #fafaf8;
+      transition: all .15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none;
+      background: var(--surface);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(200, 169, 126, .08);
+    }
+    .form-group input::placeholder, .form-group textarea::placeholder {
+      color: var(--muted);
+    }
+    .messages {
+      margin-bottom: 1.2rem;
+    }
+    .message {
+      padding: .75rem 1rem;
+      border-radius: 8px;
+      font-size: .85rem;
+      margin-bottom: .5rem;
+      border: 1px solid;
+    }
+    .message.success {
+      background: #e8f5ec;
+      color: #2e7d4f;
+      border-color: #b8dfc5;
+    }
+    .message.error {
+      background: #fde8e8;
+      color: #8a0000;
+      border-color: #f5b8b8;
+    }
+    .errorlist {
+      color: #8a0000;
+      list-style: none;
+      padding: 0;
+      margin-top: .5rem;
+      font-size: .8rem;
+    }
+    .errorlist li {
+      margin: 3px 0;
+    }
+    .form-actions {
+      display: flex;
+      gap: .5rem;
+      margin-top: 1.8rem;
+    }
+    .btn-submit {
+      flex: 1;
+      padding: 10px 16px;
+      background: var(--sidebar-bg);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: .88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .btn-submit:hover {
+      background: #2e2e4a;
+    }
+    .auth-links {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: .85rem;
+    }
+    .auth-links p {
+      margin: .5rem 0;
+      color: var(--muted);
+    }
+    .auth-links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all .15s;
+    }
+    .auth-links a:hover {
+      color: var(--accent2);
+      text-decoration: underline;
+    }
+    .help-text {
+      font-size: .7rem;
+      color: var(--muted);
+      margin-top: .3rem;
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <h1>Register</h1>
+  <div class="auth-container">
+    <div class="auth-card">
+      <a href="#" class="auth-header">
+        <div class="auth-icon">⚕️</div>
+        <div class="auth-brand">
+          <div class="auth-brand-name">MediCare</div>
+          <div class="auth-brand-sub">Clinic System</div>
+        </div>
+      </a>
 
-    {% if messages %}
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Join as a patient to book appointments</p>
+
+      {% if messages %}
         <div class="messages">
         {% for message in messages %}
-            <div class="message {{ message.tags }}">
-                <strong>{{ message }}</strong>
-            </div>
+          <div class="message {{ message.tags }}">
+            <strong>{{ message }}</strong>
+          </div>
         {% endfor %}
         </div>
-    {% endif %}
+      {% endif %}
 
-    {% if form.non_field_errors %}
-        <div class="error">
+      {% if form.non_field_errors %}
+        <div class="messages">
+          <div class="message error">
             <strong>Registration Error:</strong>
             <ul class="errorlist">
             {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
+              <li>{{ error }}</li>
             {% endfor %}
             </ul>
+          </div>
         </div>
-    {% endif %}
+      {% endif %}
 
-    <form method="post">
+      <form method="post">
         {% csrf_token %}
-        
         {% for field in form %}
-            <div>
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                    <ul class="errorlist">
-                    {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-                {% if field.help_text %}
-                    <small>{{ field.help_text|safe }}</small>
-                {% endif %}
-            </div>
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}
+              <ul class="errorlist">
+              {% for error in field.errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+              </ul>
+            {% endif %}
+            {% if field.help_text %}
+              <span class="help-text">{{ field.help_text|safe }}</span>
+            {% endif %}
+          </div>
         {% endfor %}
-        
-        <button type="submit">Register</button>
-    </form>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">Register</button>
+        </div>
+      </form>
 
-    <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+      <div class="auth-links">
+        <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
+
+    
