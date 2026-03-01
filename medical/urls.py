@@ -1,6 +1,6 @@
 
 from django.urls import path
-from medical.views import consultation_create,consultation_edit,consultation_detail,index,prescription_create,prescription_edit,add_test,edit_test
+from medical.views import consultation_create,consultation_edit,consultation_detail,index,prescription_create,prescription_edit,add_test,edit_test,view_summary
 
 
 
@@ -16,6 +16,8 @@ path('prescription/edit/<int:pk>',prescription_edit,name='edit_prescription'),
 #requesttest
 path('test/add/<int:consultation_id>',add_test,name='add_test'),
 path('test/edit/<int:pk>',edit_test,name='edit_test'),
+#
+ path("consultation/summary/<int:pk>", view_summary, name="view_summary"),
 
 
 

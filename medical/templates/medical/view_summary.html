@@ -1,51 +1,240 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Consultation Detail</title>
+<meta charset="UTF-8">
+<title>Consultation Summary · MediCare</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --bg:#f5f3ef;
+        --surface:#ffffff;
+        --sidebar-bg:#1a1a2e;
+        --accent:#c8a97e;
+        --text:#1c1c1c;
+        --muted:#7a7a7a;
+        --border:#e5e2da;
+        --radius:14px;
+        --shadow:0 4px 24px rgba(0,0,0,.07);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+
+    body{
+        font-family:'DM Sans',sans-serif;
+        background:var(--bg);
+        padding:2.5rem;
+        color:var(--text);
+    }
+
+    h1,h2,h3{
+        font-family:'DM Serif Display',serif;
+        font-weight:400;
+    }
+
+    .header{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:2rem;
+    }
+
+    .badge{
+        padding:6px 14px;
+        border-radius:20px;
+        font-size:.75rem;
+        font-weight:600;
+    }
+
+    .doctor-mode{
+        background:#e8f5ec;
+        color:#2e7d4f;
+    }
+
+    .view-mode{
+        background:#fdf3e0;
+        color:#8a5e00;
+    }
+
+    .card{
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        padding:1.8rem;
+        margin-bottom:2rem;
+        box-shadow:var(--shadow);
+    }
+
+    .section-title{
+        margin-bottom:1rem;
+    }
+
+    .label{
+        font-size:.75rem;
+        text-transform:uppercase;
+        color:var(--muted);
+        margin-bottom:5px;
+        display:block;
+        font-weight:600;
+    }
+
+    .content-box{
+        padding:1rem;
+        background:var(--bg);
+        border:1px solid var(--border);
+        border-radius:10px;
+        margin-bottom:1.2rem;
+        line-height:1.6;
+    }
+
+    .item-card{
+        background:var(--bg);
+        border:1px solid var(--border);
+        border-left:4px solid var(--accent);
+        border-radius:10px;
+        padding:1rem;
+        margin-bottom:1rem;
+    }
+
+    .item-card p{
+        margin-bottom:6px;
+    }
+
+    .btn{
+        padding:7px 16px;
+        border-radius:8px;
+        font-size:.8rem;
+        border:none;
+        cursor:pointer;
+        text-decoration:none;
+        display:inline-block;
+        transition:.15s;
+        margin-top:10px;
+    }
+
+    .btn-dark{
+        background:var(--sidebar-bg);
+        color:#fff;
+    }
+
+    .btn-ghost{
+        border:1px solid var(--border);
+        background:transparent;
+        color:var(--text);
+        margin-top:8px;
+    }
+
+</style>
 </head>
 
 <body>
-    <h2>Consultation Detail</h2>
-    <p><strong>Appointment ID:</strong> {{ object.appointment.id }}</p>
-    <p><strong>Diagnosis:</strong> {{ object.diagnosis }}</p>
-    <p><strong>Notes:</strong> {{ object.notes }}</p>
-    <h3>Prescriptions</h3>
-    <div>
-        <a href="{% url 'create_prescription' object.id %}"><button type="button">Add Prescription</button></a>
+
+<div class="header">
+    <h1>Consultation Summary</h1>
+
+    {% if request.user.role == "doctor" %}
+        <span class="badge doctor-mode">Doctor Mode</span>
+    {% elif request.user.role == "patient" %}
+        <span class="badge view-mode">Patient View</span>
+    {% endif %}
+</div>
+
+<!-- Consultation Info -->
+<div class="card">
+    <h3 class="section-title">Consultation Details</h3>
+
+    <span class="label">Diagnosis</span>
+    <div class="content-box">
+        {{ object.diagnosis|linebreaks }}
     </div>
-    <ul>
-        {% for pres in object.prescriptions.all %}
-        <li>
-            {{ pres.drug_name }} - {{ pres.dose }} - {{ pres.duration }}
-            <a href="{% url 'edit_prescription' pres.id %}"><button type="button">Edit</button></a>
-        </li>
-        {% empty %}
-        <li>No prescriptions</li>
-        {% endfor %}
-    </ul>
 
-
-    <h3>Requested Tests</h3>
-    <div>
-        <a href="{% url 'add_test' object.id %}"><button type="button">Add Test</button></a>
+    <span class="label">Doctor Notes</span>
+    <div class="content-box">
+        {{ object.notes|linebreaks }}
     </div>
-    <ul>
-        {% for test in object.tests.all %}
-        <li>
-            {{ test.test_name }} - {{ test.notes }}
-            <a href="{% url 'edit_test' test.id %}"><button type="button">Edit</button></a>
-        </li>
-        {% empty %}
-        <li>No tests requested</li>
-        {% endfor %}
-    </ul>
 
-    <a href="{% url 'consultation_edit' object.id %}">Edit Consultation</a>
-    <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">finish consultation</a>
+    {% if request.user.role == "doctor" %}
+        <a href="{% url 'consultation_edit' object.id %}" class="btn btn-dark">
+            ✏️ Edit Full Consultation
+        </a>
+    {% endif %}
+</div>
 
+<!-- Prescriptions -->
+<div class="card">
+    <h3 class="section-title">Prescriptions</h3>
 
+    {% if request.user.role == "doctor" %}
+        <a href="{% url 'create_prescription' object.id %}" class="btn btn-dark">
+            ➕ Add Prescription
+        </a>
+    {% endif %}
+
+    <br><br>
+
+    {% for pres in object.prescriptions.all %}
+        <div class="item-card">
+            <p><strong>Drug Name:</strong> {{ pres.drug_name }}</p>
+            <p><strong>Dose:</strong> {{ pres.dose }}</p>
+            <p><strong>Duration:</strong> {{ pres.duration }}</p>
+
+            {% if pres.instructions %}
+                <p><strong>Instructions:</strong> {{ pres.instructions|linebreaks }}</p>
+            {% endif %}
+
+            {% if request.user.role == "doctor" %}
+                <a href="{% url 'edit_prescription' pres.id %}" class="btn btn-ghost">
+                    Edit
+                </a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p style="color:var(--muted)">No prescriptions added.</p>
+    {% endfor %}
+</div>
+
+<!-- Requested Tests -->
+<div class="card">
+    <h3 class="section-title">Requested Tests</h3>
+
+    {% if request.user.role == "doctor" %}
+        <a href="{% url 'add_test' object.id %}" class="btn btn-dark">
+            ➕ Add Test
+        </a>
+    {% endif %}
+
+    <br><br>
+
+    {% for test in object.tests.all %}
+        <div class="item-card">
+            <p><strong>Test Name:</strong> {{ test.test_name }}</p>
+
+            {% if test.description %}
+                <p><strong>Description:</strong> {{ test.description|linebreaks }}</p>
+            {% endif %}
+
+            {% if test.notes %}
+                <p><strong>Doctor Notes:</strong> {{ test.notes|linebreaks }}</p>
+            {% endif %}
+
+            {% if request.user.role == "doctor" %}
+                <a href="{% url 'edit_test' test.id %}" class="btn btn-ghost">
+                    Edit
+                </a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p style="color:var(--muted)">No tests requested.</p>
+    {% endfor %}
+</div>
+
+{% if request.user.role == "doctor" %}
+    <a href="{% url 'doctor_dashboard' %}" class="btn btn-dark">
+        ✅ Finish Consultation
+    </a>
+{% endif %}
 
 </body>
-
 </html>
