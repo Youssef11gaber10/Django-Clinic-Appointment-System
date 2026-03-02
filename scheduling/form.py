@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Availability
+from .models import Availability, DoctorException
 
 User = get_user_model()
 
@@ -25,3 +25,16 @@ class AvailabilityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['doctor'].queryset = User.objects.filter(role='doctor')
+
+# doctor exception form
+class DoctorExceptionForm(forms.ModelForm):
+    class Meta:
+        model = DoctorException
+        fields = ('doctor', 'date', 'reason', 'is_available')
+        widgets = {
+            'date' : forms.DateInput(attrs={'type': 'date'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['doctor'].queryset = User.objects.filter(role = 'doctor')

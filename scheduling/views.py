@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from scheduling.models import Availability, Slot
-from .form import GenerateSlotsForm, AvailabilityForm
+from scheduling.models import Availability, Slot, DoctorException
+from .form import GenerateSlotsForm, AvailabilityForm, DoctorExceptionForm
 from .services import slot_generator
 from django.contrib.auth import get_user_model
 
@@ -83,4 +83,38 @@ def availability_delete(request, pk):
         obj.delete()
         messages.success(request, 'Availability removed.')
         return redirect('scheduling:availability_list')
+    return render(request, 'scheduling/availability_list.html', {'object': obj})
+
+# exception views
+@receptionist_required
+def exception_list(request):
+    exceptions = DoctorException.objects.all().select_related('doctor')
+    return render(request, 'scheduling/exception_list.html',{
+        'exceptions': exceptions,
+    })
+
+@receptionist_required
+def exception_add(request):
+    if request.method == "POST":
+        form = DoctorExceptionForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.save()
+            messages.success(request, "Exception added successfully")
+            return redirect('scheduling:exception_list')
+    else:
+        form = DoctorExceptionForm()
+
+    return render(request, 'scheduling/exception_form.html',{
+        'form':form,
+        'title' : 'Add Exception'
+    })
+
+@receptionist_required
+def exception_delete(request, pk):
+    obj = get_object_or_404(DoctorException, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+        messages.success(request, "Exception removed")
+        return redirect("scheduling:exception_list")
     return render(request, 'scheduling/availability_list.html', {'object': obj})
