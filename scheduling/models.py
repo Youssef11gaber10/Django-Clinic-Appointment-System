@@ -51,7 +51,7 @@ class DoctorException(models.Model):
     doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='exceptions')
     date = models.DateField()
     reason = models.TextField()
-    is_available = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('doctor', 'date')

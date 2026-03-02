@@ -68,7 +68,7 @@ class AvailabilityForm(forms.ModelForm):
 class DoctorExceptionForm(forms.ModelForm):
     class Meta:
         model = DoctorException
-        fields = ('doctor', 'date', 'reason', 'is_available')
+        fields = ('doctor', 'date', 'reason')
         widgets = {
             'date' : forms.DateInput(attrs={'type': 'date'})
         }
