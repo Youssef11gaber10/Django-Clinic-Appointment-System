@@ -2,23 +2,17 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-<<<<<<< Updated upstream
 from scheduling.models import Availability, Slot, DoctorException
 from .form import GenerateSlotsForm, AvailabilityForm, DoctorExceptionForm
-=======
 from scheduling.models import Availability
 from .form import GenerateSlotsForm, AvailabilityForm
->>>>>>> Stashed changes
 from .services import slot_generator
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
 def receptionist_required(view_func):
-<<<<<<< Updated upstream
-=======
-    """Restrict view to receptionist role only."""
->>>>>>> Stashed changes
+
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.error(request, 'You must be logged in to access this page.')
@@ -54,6 +48,11 @@ def generate_slots_view(request):
 
     return render(request, 'scheduling/generate_slots.html', {'form': form})
     
+def slot_list(request):
+    slots = Slot.objects.all().select_related('doctor')
+    return render(request, 'scheduling/slot_list.html', {
+        'slots': slots,
+    })
 
 #  availability views
 @receptionist_required
@@ -87,4 +86,38 @@ def availability_delete(request, pk):
         obj.delete()
         messages.success(request, 'Availability removed.')
         return redirect('scheduling:availability_list')
+    return render(request, 'scheduling/availability_list.html', {'object': obj})
+
+# exception views
+@receptionist_required
+def exception_list(request):
+    exceptions = DoctorException.objects.all().select_related('doctor')
+    return render(request, 'scheduling/exception_list.html',{
+        'exceptions': exceptions,
+    })
+
+@receptionist_required
+def exception_add(request):
+    if request.method == "POST":
+        form = DoctorExceptionForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.save()
+            messages.success(request, "Exception added successfully")
+            return redirect('scheduling:exception_list')
+    else:
+        form = DoctorExceptionForm()
+
+    return render(request, 'scheduling/exception_form.html',{
+        'form':form,
+        'title' : 'Add Exception'
+    })
+
+@receptionist_required
+def exception_delete(request, pk):
+    obj = get_object_or_404(DoctorException, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+        messages.success(request, "Exception removed")
+        return redirect("scheduling:exception_list")
     return render(request, 'scheduling/availability_list.html', {'object': obj})
