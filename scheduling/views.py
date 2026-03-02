@@ -8,6 +8,7 @@ from scheduling.models import Availability
 from .form import GenerateSlotsForm, AvailabilityForm
 from .services import slot_generator
 from django.contrib.auth import get_user_model
+from datetime import datetime
 
 User = get_user_model()
 
@@ -27,21 +28,16 @@ def receptionist_required(view_func):
 def generate_slots_view(request):
     if request.method == 'POST':
       form = GenerateSlotsForm(request.POST)
-      
       form.fields['doctor'].queryset = User.objects.filter(role='doctor')
-
 
       if form.is_valid():
         doctor = form.cleaned_data['doctor']
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
-
-        if end_date < start_date:
-           messages.error(request, "End date must be after start date")
-        else:
-           slots_count = slot_generator(doctor, start_date, end_date)
-           messages.success(request,f"Generated ${slots_count} successfully")
-           return redirect('scheduling:generate_slots')
+    
+        slots_count = slot_generator(doctor, start_date, end_date)
+        messages.success(request,f"Generated {slots_count} successfully")
+        return redirect('scheduling:generate_slots')
     else:
         form = GenerateSlotsForm()
         form.fields['doctor'].queryset = User.objects.filter(role='doctor')
@@ -103,6 +99,16 @@ def exception_add(request):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.save()
+
+            exception_date = obj.date
+            if isinstance(exception_date, datetime):
+                exception_date = exception_date.date()
+
+            Slot.objects.filter(
+                doctor=obj.doctor,
+                start_time__date=exception_date
+            ).update(is_available=False)
+
             messages.success(request, "Exception added successfully")
             return redirect('scheduling:exception_list')
     else:
