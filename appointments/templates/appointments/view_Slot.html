@@ -1,0 +1,21 @@
+<h2>Available Slots</h2>
+
+{% for slot in slots %}
+    <div>
+        <p>
+            Doctor: {{ slot.doctor }}
+            <br>
+            Start: {{ slot.start_time }}
+            <br>
+            End: {{ slot.end_time }}
+        </p>
+
+        <form method="post" action="{% url 'appointments:book_appointment' slot.id %}">
+            {% csrf_token %}
+            <button type="submit">Book This Slot</button>
+        </form>
+    </div>
+    <hr>
+{% empty %}
+    <p>No available slots.</p>
+{% endfor %}

@@ -1,11 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Receptionist Dashboard</title>
 </head>
+
 <body>
     <h1>Receptionist Dashboard</h1>
+    <a href="{% url 'add_availability' %}">Add Availability</a>
+    <br>
+    <a href="{% url 'generate_slots' %}">Generate Slots</a>
+    <hr>
+    {% for doctor in doctors %}
+    <h2>Doctor: {{ doctor.username }}</h2>
+    <h3>Availabilities:</h3>
+    {% for av in doctor.availabilities.all %}
+    <p>
+        {{ av.date_of_week }} :
+        {{ av.start_time }} - {{ av.end_time }}
+    </p>
+    {% empty %}
+    <p>No availability added.</p>
+    {% endfor %}
+    <h3>Slots:</h3>
+    {% for slot in doctor.slots.all %}
+    <p>
+        {{ slot.start_time }} - {{ slot.end_time }}
+        {% if slot.is_available %}
+        (Available)
+        {% else %}
+        (Booked)
+        {% endif %}
+    </p>
+    {% for appointment in slot.appointments.all %}
+    <p>
+        Appointment Status: {{ appointment.status }}
+        {% if appointment.status == "requested" %}
+    <form method="post"  action="{% url 'appointments:confirm_appointment' appointment.id %}"> 
+        {% csrf_token %}
+        <button type="submit">Confirm</button>
+    </form>
+    {% endif %}
+    </p>
+    {% endfor %}
+    {% empty %}
+    <p>No slots generated.</p>
+    {% endfor %}
+    <hr>
+    {% endfor %}
 </body>
+
 </html>

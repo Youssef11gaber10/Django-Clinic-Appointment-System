@@ -1,0 +1,135 @@
+{% load static %}
+
+<div class="appt-card {% if appt.status == 'completed' %}dimmed{% endif %}">
+
+  <!-- ── Band ── -->
+  <div class="appt-card-band">
+    <div class="appt-band-left">
+      <div class="appt-date-badge">
+        <div class="day">{{ appt.slot.start_time|date:"d" }}</div>
+        <div class="mon">{{ appt.slot.start_time|date:"M" }}</div>
+      </div>
+      <div class="appt-band-title">
+        <h3>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</h3>
+        <p>
+          {% if show_queue %}
+            {% if appt.check_in_at %}
+              Checked in at {{ appt.check_in_at|date:"g:i A" }} &nbsp;·&nbsp;
+            {% else %}
+              Appointment at {{ appt.slot.start_time|date:"g:i A" }} &nbsp;·&nbsp;
+            {% endif %}
+            #{{ loop_counter }} in queue
+          {% else %}
+            Completed · {{ appt.slot.start_time|date:"g:i A" }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <div class="band-right">
+      {% if show_queue %}
+        {% if appt.check_in_at %}
+          <span class="wait-pill"
+                id="wait-{{ appt.id }}"
+                data-checkin="{{ appt.check_in_at|date:'c' }}">
+            ⏱ <span class="wait-mins">--</span>m waiting
+          </span>
+        {% else %}
+          <span class="wait-pill wait-short">⏱ Not yet checked in</span>
+        {% endif %}
+      {% endif %}
+
+      <span class="status-badge s-{{ appt.status|lower }}">
+        <span class="sbadge-dot"></span>
+        {{ appt.get_status_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Body ── -->
+  <div class="appt-card-body">
+
+    <!-- Patient info -->
+    <div class="pat-col">
+      <div class="pat-avatar">
+      
+        {{ appt.patient.first_name|first|upper }}{{ appt.patient.last_name|first|upper }}
+      </div>
+      <div>
+        <div class="pat-name">{{ appt.patient.get_full_name }}</div>
+        {% if appt.patient.patient_profile.date_of_birth %}
+          <div class="pat-meta"><strong>Age</strong>: {{ appt.patient.patient_profile.date_of_birth|timesince }}</div>
+        {% endif %}
+        <div class="pat-meta"><strong>Gender</strong>: {{ appt.patient.patient_profile.gender }}</div>
+        <div class="pat-meta"><strong>Phone</strong>: {{ appt.patient.phone_number }}</div>
+      </div>
+    </div>
+
+    <!-- Detail grid -->
+    <div class="appt-details">
+      <div class="detail-item">
+        <label>Appointment Time</label>
+        <span>
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+          {{ appt.slot.start_time|date:"g:i A" }}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>End Time</label>
+        <span>
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5z"/></svg>
+          {{ appt.slot.end_time|date:"g:i A" }}
+        </span>
+      </div>
+      <div class="detail-item">
+        <label>Status</label>
+        <span>{{ appt.get_status_display }}</span>
+      </div>
+      {% if not show_queue and appt.consultation %}
+        <div class="detail-item">
+          <label>Diagnosis</label>
+          <span>{{ appt.consultation.diagnosis|default:"—"|truncatechars:30 }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Duration</label>
+          <span>{{ user.doctor_profile.session_duration }} min</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="appt-actions-col">
+      {% if show_queue %}
+
+        {% if appt.status == 'checked_in' %}
+          <form method="POST" action="{% url 'create_consultation' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-green">📝 Fill Consultation</button>
+          </form>
+          
+
+        {% elif appt.status == 'confirmed' %}
+          <form method="POST" action="{% url 'check_in_appointment' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-green">✓ Check In</button>
+          </form>
+          <button class="btn btn-red"
+                  onclick="openNoShow('{{ appt.id }}', '{{ appt.patient.get_full_name }}')">
+            Mark No Show
+          </button>
+
+        {% elif appt.status == 'no_show' %}
+          <span class="btn btn-ghost" style="cursor:default; opacity:.6;">No Show</span>
+
+        {% endif %}
+
+      {% else %}
+        {# completed tab — always show view record #}
+        <a href="{% url 'view_summary' appt.consultation.id %}" class="btn btn-ghost">
+          👁 View Record
+        </a>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

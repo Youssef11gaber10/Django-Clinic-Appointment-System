@@ -37,13 +37,12 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     check_in_at = models.DateTimeField(null=True , blank=True)
     updated_at = models.DateTimeField(auto_now=True)
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['slot'], name = 'unique_slot')
-        ] 
-    
-    @transaction.atomic
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(fields=['slot'], name = 'unique_slot')
+    #     ] 
     @classmethod
+    @transaction.atomic
     def request_appointment(cls , slot , user):
         if user.role != "patient":
             raise ValidationError("Only patients can book appointments.")
@@ -61,6 +60,10 @@ class Appointment(models.Model):
         
         if overlapping_exists:
             raise ValidationError("You already have an overlapping appointment.")
+        
+        already_booked = cls.objects.filter(slot=slot, status__in=active_statuses).exists()
+        if already_booked:
+            raise ValidationError("This slot is already booked.")
         
         if not slot.is_available:
             raise ValidationError("This slot has already been booked.")
@@ -134,10 +137,37 @@ class Appointment(models.Model):
         self.status = self.COMPLETED
         self.save()
 
+    @transaction.atomic
+    def reschedule(self, new_slot, user, reason):
 
+        if self.patient != user:
+            raise PermissionDenied("You can only reschedule your own appointment.")
 
+        if self.status not in [self.REQUESTED, self.CONFIRMED]:
+            raise ValidationError("This appointment cannot be rescheduled.")
 
-    
+        if not new_slot.is_available:
+            raise ValidationError("Selected slot is not available.")
+
+        old_start = self.slot.start_time
+        self.slot.is_available = True
+        self.slot.save()
+
+        self.slot = new_slot
+        self.status = self.REQUESTED  
+        self.save()
+
+        new_slot.is_available = False
+        new_slot.save()
+
+        RescheduleHistory.objects.create(
+            appointment=self,
+            old_start_datetime=old_start,
+            new_start_datetime=new_slot.start_time,
+            changed_by=user,
+            reason=reason
+        )
+
     def __str__(self):
         return f"Appointment #{self.id} - {self.patient.username}"
 
