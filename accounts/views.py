@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm, DoctorProfileUpdateForm 
 from .models import UserApp as User, PatientProfile, DoctorProfile
+from django.urls import reverse
 
 def patient_register(request):
     if request.method == 'POST':
@@ -160,7 +161,12 @@ def admin_edit_user(request, user_id):
             return redirect('users_list')
     else:
         user_form = UserUpdateForm(instance=user)
-    return render(request, 'registration/edit_profile.html', {'user_form': user_form, 'user': user, 'is_admin_edit': True})
+    return render(request, 'registration/edit_profile.html', {
+        'user_form': user_form,
+        'user': user,
+        'is_admin_edit': True,
+        'redirect_to': reverse('users_list')
+    })
 def admin_delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
