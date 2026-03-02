@@ -352,6 +352,14 @@
     .btn-primary:hover {
       background: #2e2e4a;
     }
+
+    .header-actions{
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -373,7 +381,13 @@
     </div>
 
     <div class="header-actions">
-      <a href="{% url 'admin_register' %}" class="btn-primary">+ Register New User</a>
+      <div class="header-actions">
+        <a href="{% url 'admin_register' %}" class="btn-primary">+ Register New User</a>
+      </div>
+      
+      <div class="header-actions">
+        <a href="{% url 'analytics' %}" class="btn-primary"> View Analytics</a>
+      </div>
     </div>
 
     <div class="table-container">
