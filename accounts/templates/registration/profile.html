@@ -361,9 +361,9 @@
         </div>
       {% endif %}
 
-      {% if user.role == 'admin' %}
+      {% if user.role == 'admin' or user.role == 'receptionist' %}
         <div class="profile-section">
-          <h3>Admin Details</h3>
+          <h3>{{ user.role|capfirst }} Details</h3>
           <div class="detail-row">
             <span class="detail-label">Email</span>
             <span class="detail-value">{{ user.email }}</span>
