@@ -1,6 +1,10 @@
 from django import forms
 from django.contrib.auth import get_user_model
+<<<<<<< Updated upstream
 from .models import Availability, DoctorException
+=======
+from .models import Availability
+>>>>>>> Stashed changes
 
 User = get_user_model()
 
@@ -25,6 +29,7 @@ class AvailabilityForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['doctor'].queryset = User.objects.filter(role='doctor')
+<<<<<<< Updated upstream
 
 # doctor exception form
 class DoctorExceptionForm(forms.ModelForm):
@@ -38,3 +43,5 @@ class DoctorExceptionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['doctor'].queryset = User.objects.filter(role = 'doctor')
+=======
+>>>>>>> Stashed changes

@@ -4,7 +4,10 @@
 
 from datetime import date, datetime, timedelta
 from .models import Availability, Slot, DoctorException
+<<<<<<< Updated upstream
 from appointments.models import Appointment , RescheduleHistory
+=======
+>>>>>>> Stashed changes
 
 # get the days available between the start date and end date of the doctor
 def get_days_between(start_date, end_date):
