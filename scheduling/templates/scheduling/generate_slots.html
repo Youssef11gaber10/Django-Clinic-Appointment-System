@@ -115,7 +115,10 @@
               >{{ field.errors.0 }}</span
             >{% endif %}
           </div>
-          {% endfor %}
+          {% endfor %} {% if form.non_field_errors %}
+          <div class="message-error">{{ form.non_field_errors.0 }}</div>
+          {% endif %}
+
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">
               Generate slots
