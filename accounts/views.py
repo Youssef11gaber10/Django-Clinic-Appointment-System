@@ -28,7 +28,6 @@ def patient_register(request):
         form = PatientUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.save()
             assign_user_to_group(user)
             send_email(user) 
             messages.success(request, 'Account created! Check your email to verify your account.')
@@ -46,7 +45,6 @@ def admin_register(request):
         form = BaseUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            user.save()
             assign_user_to_group(user)
             if user.role == 'patient':
                 PatientProfile.objects.create(user=user)
