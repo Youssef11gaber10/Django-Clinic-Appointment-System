@@ -1,6 +1,14 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.shortcuts import reverse , get_object_or_404
+
+class CustomUserManager(UserManager):
+    def create_superuser(self, username, email, password, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', 'admin')  
+        extra_fields.setdefault('is_active', True)  
+        return super().create_superuser(username, email, password, **extra_fields)
 
 class UserApp(AbstractUser):
     role = models.CharField(max_length=20, choices=[('doctor', 'Doctor'), 
@@ -11,6 +19,9 @@ class UserApp(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = CustomUserManager()  # Use custom manager
+    
     def __str__(self):
         return self.username
     
