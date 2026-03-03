@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib import messages
 from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm, DoctorProfileUpdateForm 
 from .models import UserApp as User, PatientProfile, DoctorProfile
+from django_email_verification import send_email
 from django.urls import reverse
 
 def assign_user_to_group(user):
@@ -27,9 +28,15 @@ def patient_register(request):
         form = PatientUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            user.save()
             assign_user_to_group(user)
-            messages.success(request, 'Your account has been created successfully. You can now log in.')
+            send_email(user) 
+            messages.success(request, 'Account created! Check your email to verify your account.')
             return redirect('login')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
     else:
         form = PatientUserCreationForm()
     return render(request, 'registration/patient_register.html', {'form': form})
@@ -38,14 +45,15 @@ def admin_register(request):
     if request.method == 'POST':
         form = BaseUserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
+            user = form.save()
             user.save()
             assign_user_to_group(user)
             if user.role == 'patient':
                 PatientProfile.objects.create(user=user)
             elif user.role == 'doctor':
                 DoctorProfile.objects.create(user=user)
-            messages.success(request, f'{user.role.capitalize()} account has been created successfully.')
+            send_email(user)  
+            messages.success(request, f'{user.role.capitalize()} account created! Email verification sent to user.')
             return redirect('users_list')
     else:
         form = BaseUserCreationForm()
@@ -53,6 +61,10 @@ def admin_register(request):
 
 def user_login(request):
     context = {}
+    
+    if request.method == 'GET':
+        storage = messages.get_messages(request)
+        storage.used = True
     
     if request.method == 'POST':
         username = request.POST.get('username', '')
@@ -64,6 +76,9 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             
             if user is not None:
+                if not user.is_active:
+                    messages.error(request, 'Your account is inactive. Please verify your email.')
+                    return render(request, 'registration/login.html', context)
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
                 return redirect('/accounts/profile/')  

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
     'medical.apps.MedicalConfig',
     'scheduling.apps.SchedulingConfig',
+    'django_email_verification',
     # 'scheduling'
 ]
 
@@ -114,6 +115,45 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.UserApp'
+
+# Email Configuration (Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'somaya.ayman.elsayed@gmail.com'  
+EMAIL_HOST_PASSWORD = "cfxx rwau yfva fpep" 
+DEFAULT_FROM_EMAIL = 'somaya.ayman.elsayed@gmail.com'  
+
+# django-email-verification Configuration
+EMAIL_FROM_ADDRESS = DEFAULT_FROM_EMAIL
+EMAIL_PAGE_DOMAIN = 'http://localhost:8000/'
+
+# Email Verification Settings - used for BOTH signup and password reset
+def email_verified_callback(user):
+    user.is_active = True
+
+# Signup Email Verification
+EMAIL_MAIL_SUBJECT = 'Verify it\'s you {{ user.username }}'
+EMAIL_MAIL_HTML = 'registration/emails/verify_email.html'
+EMAIL_MAIL_PLAIN = 'registration/emails/verify_email.txt'
+EMAIL_MAIL_TOKEN_LIFE = 60 * 60  
+EMAIL_MAIL_PAGE_TEMPLATE = 'registration/emails/verification_success.html'
+EMAIL_MAIL_CALLBACK = email_verified_callback
+
+# Password Reset 
+def password_change_callback(user, password):
+    user.set_password(password)
+
+EMAIL_PASSWORD_SUBJECT = 'Verify it\'s you {{ user.username }}'
+EMAIL_PASSWORD_HTML = 'registration/emails/verify_email.html'  
+EMAIL_PASSWORD_PLAIN = 'registration/emails/verify_email.txt'  
+EMAIL_PASSWORD_TOKEN_LIFE = 60 * 10  
+EMAIL_PASSWORD_PAGE_TEMPLATE = 'registration/emails/verification_success.html'  
+EMAIL_PASSWORD_CALLBACK = password_change_callback
+
+# Token expiration (in seconds) - 24 hours
+PASSWORD_RESET_TIMEOUT = 86400
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
