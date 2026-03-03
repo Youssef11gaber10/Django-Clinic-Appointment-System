@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -50,6 +51,15 @@ def slot_list(request):
         'slots': slots,
     })
 
+def slot_delete(request, pk):
+    obj = get_object_or_404(Slot, pk=pk)
+    if request.method == 'POST':
+        obj.delete()
+        print(f"Deleted slot {obj} with id {pk}")
+        messages.success(request, 'Slot removed.')
+        return redirect('scheduling:slot_list')
+    return render(request, 'scheduling/slot_list.html', {'object': obj})
+
 #  availability views
 @receptionist_required
 def availability_list(request):
@@ -78,6 +88,16 @@ def availability_add(request):
 
 def availability_delete(request, pk):
     obj = get_object_or_404(Availability, pk=pk)
+    has_solts = Slot.objects.filter(
+            doctor=obj.doctor,  
+            start_time__time__gte= obj.start_time,
+            start_time__time__lte= obj.end_time,
+        ).exists()
+
+    if has_solts:
+        messages.error(request, "You can't delete this availability because there are slots generated based on it. Please delete the related slots first.")
+        return redirect('scheduling:availability_list')
+    
     if request.method == 'POST':
         obj.delete()
         messages.success(request, 'Availability removed.')
@@ -107,7 +127,8 @@ def exception_add(request):
             Slot.objects.filter(
                 doctor=obj.doctor,
                 start_time__date=exception_date
-            ).update(is_available=False)
+            # ).update(is_available=False)
+            ).update(is_available=False, is_exception=True)
 
             messages.success(request, "Exception added successfully")
             return redirect('scheduling:exception_list')
@@ -124,6 +145,11 @@ def exception_delete(request, pk):
     obj = get_object_or_404(DoctorException, pk=pk)
     if request.method == "POST":
         obj.delete()
+        Slot.objects.filter(
+            doctor=obj.doctor,
+            start_time__date=obj.date
+        ).update(is_available=True, is_exception=False)
+
         messages.success(request, "Exception removed")
         return redirect("scheduling:exception_list")
     return render(request, 'scheduling/availability_list.html', {'object': obj})
