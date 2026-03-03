@@ -99,6 +99,14 @@
               ✕ Cancel
             </button>
           </form>
+
+           <form method="POST" action="{% url 'reschedule_appointment' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-green"
+                    onclick="return confirm('Reschedule this appointment?')">
+              Reschedule
+            </button>
+          </form>
         {% else %}
           <span class="btn btn-ghost" style="cursor:default; opacity:.6;">
             {{ appt.get_status_display }}

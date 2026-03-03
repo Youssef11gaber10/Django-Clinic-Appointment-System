@@ -2,9 +2,11 @@ from django.shortcuts import render
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
-from appointments.models import Appointment
+from appointments.models import Appointment, RescheduleHistory
 from accounts.models import UserApp
+from accounts.permissions import require_role
 
 
 def get_overall_appointment_metrics():
@@ -21,7 +23,7 @@ def get_overall_appointment_metrics():
 def get_doctor_appointment_metrics():
     return (
         Appointment.objects
-        .values("doctor_id", "doctor__username")
+        .values("doctor_id", "doctor__username", "doctor__first_name", "doctor__last_name")
         .annotate(
             total_appointments=Count("id"),
             completed_appointments=Count("id", filter=Q(status=Appointment.COMPLETED)),
@@ -80,15 +82,23 @@ def get_monthly_insights():
     )
 
 
-
+def get_rescheduled_appointments():
+    return RescheduleHistory.objects.all()
 # Analytics Dashboard View
+
+
+@login_required(login_url='login')
+@require_role('admin')
 def analytics(request):
+
+
     context = {
         "appointments_insights": get_overall_appointment_metrics(),
         "doctors_insights": get_doctor_appointment_metrics(),
         "total_doctors_patients": get_total_patients_doctors(),
         "daily_insights": get_daily_insights(),
         "monthly_insights": get_monthly_insights(),
+        "rescheduled_appointments": get_rescheduled_appointments(),
         "generated_at": timezone.now(),
     }
 
