@@ -28,7 +28,7 @@ def cancel_appointment(request, appointment_id):
         messages.success(request, "Appointment cancelled successfully.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("dashboard:patient_dashboard")
+    return redirect("patient_dashboard")
 
 
 
@@ -39,7 +39,7 @@ def confirm_appointment(request, appointment_id):
         messages.success(request, "Appointment confirmed.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("dashboard:recep_dashboard")
+    return redirect("recep_dashboard")
 
 
 def check_in_appointment(request, appointment_id):
@@ -80,7 +80,7 @@ def reschedule_page(request, appointment_id):
     appointment = get_object_or_404(Appointment, id=appointment_id)
 
     if appointment.patient != request.user:
-        return redirect("dashboard:patient_dashboard")
+        return redirect("patient_dashboard")
 
     available_slots = Slot.objects.filter(
         doctor=appointment.slot.doctor,
@@ -97,7 +97,7 @@ def reschedule_page(request, appointment_id):
         try:
             appointment.reschedule(new_slot, request.user, reason)
             messages.success(request, "Appointment rescheduled successfully.")
-            return redirect("dashboard:patient_dashboard")
+            return redirect("patient_dashboard")
         except Exception as e:
             messages.error(request, str(e))
 

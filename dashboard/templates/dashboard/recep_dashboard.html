@@ -1,53 +1,144 @@
+
+{% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Receptionist Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receptionist Dashboard · MediCare</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background:#f5f3ef; color:#1c1c1c; margin:0; padding:0; }
+    h1,h2,h3 { font-family: 'DM Serif Display', serif; }
+    .container { max-width:1200px; margin:2rem auto; padding:0 1rem; }
+    .header { background:#1a1a2e; color:white; padding:1rem 2rem; border-radius:10px; margin-bottom:2rem; }
+    .header h1 { margin:0; font-weight:400; font-size:1.8rem; }
+    .section { background:#fff; padding:1.5rem; border-radius:14px; margin-bottom:2rem; box-shadow:0 4px 24px rgba(0,0,0,.07); }
+    select, button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; font-size:.9rem; }
+    button { cursor:pointer; background:#1a1a2e; color:#fff; border:none; transition:.2s; }
+    button:hover { background:#2c2c4a; }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th, td { padding:10px; border:1px solid #e5e2da; text-align:center; }
+    th { background:#1a1a2e; color:#fff; }
+    .badge { padding:4px 10px; border-radius:20px; font-size:.75rem; font-weight:600; display:inline-block; }
+    .available { background:#6abf8a; color:white; }
+    .booked { background:#e07070; color:white; }
+    .confirmed { background:#1a6180; color:white; }
+  </style>
 </head>
-
 <body>
-    <h1>Receptionist Dashboard</h1>
-    <a href="{% url 'add_availability' %}">Add Availability</a>
-    <br>
-    <a href="{% url 'generate_slots' %}">Generate Slots</a>
-    <hr>
-    {% for doctor in doctors %}
-    <h2>Doctor: {{ doctor.username }}</h2>
-    <h3>Availabilities:</h3>
-    {% for av in doctor.availabilities.all %}
-    <p>
-        {{ av.date_of_week }} :
-        {{ av.start_time }} - {{ av.end_time }}
-    </p>
-    {% empty %}
-    <p>No availability added.</p>
-    {% endfor %}
-    <h3>Slots:</h3>
-    {% for slot in doctor.slots.all %}
-    <p>
-        {{ slot.start_time }} - {{ slot.end_time }}
-        {% if slot.is_available %}
-        (Available)
-        {% else %}
-        (Booked)
-        {% endif %}
-    </p>
-    {% for appointment in slot.appointments.all %}
-    <p>
-        Appointment Status: {{ appointment.status }}
-        {% if appointment.status == "requested" %}
-    <form method="post"  action="{% url 'appointments:confirm_appointment' appointment.id %}"> 
-        {% csrf_token %}
-        <button type="submit">Confirm</button>
-    </form>
-    {% endif %}
-    </p>
-    {% endfor %}
-    {% empty %}
-    <p>No slots generated.</p>
-    {% endfor %}
-    <hr>
-    {% endfor %}
-</body>
 
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Receptionist Dashboard</h1>
+  </div>
+
+  <!-- Select Doctor -->
+  <div class="section">
+    <h2>Select Doctor</h2>
+    <form method="get">
+        <select name="doctor" onchange="this.form.submit()">
+            <option value="">-- Choose Doctor --</option>
+            {% for doctor in doctors %}
+                <option value="{{ doctor.id }}" {% if selected_doctor and doctor.id == selected_doctor.id %}selected{% endif %}>
+                    Dr. {{ doctor.username }}
+                </option>
+            {% endfor %}
+        </select>
+        <button type="submit">View</button>
+    </form>
+
+    {% if selected_doctor %}
+    <div style="margin-top:1rem;">
+      <a href="{% url 'scheduling:availability_add' %}?doctor={{ selected_doctor.id }}" style="margin-right:10px; text-decoration:none;">
+        <button type="button">➕ Add Availability</button>
+      </a>
+      <a href="{% url 'scheduling:generate_slots' %}?doctor={{ selected_doctor.id }}" style="text-decoration:none;">
+        <button type="button">⚙ Generate Slots</button>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if selected_doctor %}
+  <!-- Availabilities -->
+  <div class="section">
+    <h2>Availabilities</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for av in availabilities %}
+        <tr>
+          <td>{{ av.date_of_week }}</td>
+          <td>{{ av.start_time|time:"h:i a" }}</td>
+          <td>{{ av.end_time|time:"h:i a" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No availability yet</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Slots -->
+  <div class="section">
+    <h2>Slots</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for slot in slots %}
+        <tr>
+          <td>{{ slot.date|default:slot.start_time|date:"M d, Y" }}</td>
+          <td>{{ slot.start_time|time:"h:i a" }} - {{ slot.end_time|time:"h:i a" }}</td>
+
+          <td>
+  {% if slot.is_available %}
+    <span class="badge available">Available</span>
+  {% else %}
+    {% for app in slot.appointments.all %}
+      {% if app.status == "confirmed" %}
+        <span class="badge confirmed">Confirmed</span>
+      {% elif app.status == "requested" %}
+        <span class="badge booked">Requested</span>
+        <form method="post" action="{% url 'confirm_appointment' app.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="padding:4px 8px; margin-left:5px; font-size:.75rem; border-radius:8px; background:#1a6180; color:white; border:none; cursor:pointer;">Confirm</button>
+        </form>
+      {% else %}
+        <span class="badge booked">{{ app.status|capfirst }}</span>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="3">No slots yet</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+</body>
 </html>
