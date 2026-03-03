@@ -13,6 +13,7 @@ from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfile
 from .models import UserApp as User, PatientProfile, DoctorProfile
 from django_email_verification import send_email
 from django.urls import reverse, reverse_lazy
+from .permissions import require_role
 
 def assign_user_to_group(user):
     role_to_group = {
@@ -46,6 +47,8 @@ def patient_register(request):
         form = PatientUserCreationForm()
     return render(request, 'registration/patient_register.html', {'form': form})
 
+@login_required(login_url='login')
+@require_role('admin')
 def admin_register(request):
     if request.method == 'POST':
         form = BaseUserCreationForm(request.POST)
@@ -91,6 +94,7 @@ def user_login(request):
     
     return render(request, 'registration/login.html', context)
 
+@login_required(login_url='login')
 def user_logout(request):
     logout(request)
     messages.info(request, 'You have been logged out.')
@@ -165,11 +169,15 @@ def edit_profile(request):
         'user_form': user_form,
         'profile_form': profile_form
     })
-
+    
+@login_required(login_url='login')
+@require_role('admin')
 def list_users(request):
     users = User.objects.all()
     return render(request, 'registration/users_list.html', {'users': users})
 
+@login_required(login_url='login')
+@require_role('admin')
 def admin_edit_user(request, user_id):
     user = User.objects.get(id=user_id)
     if request.method == 'POST':
@@ -194,7 +202,9 @@ def admin_edit_user(request, user_id):
         'is_admin_edit': True,
         'redirect_to': reverse('users_list')
     })
-    
+
+@login_required(login_url='login')
+@require_role('admin')
 def admin_delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
