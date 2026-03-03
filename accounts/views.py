@@ -1,16 +1,33 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.contrib import messages
 from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm, DoctorProfileUpdateForm 
 from .models import UserApp as User, PatientProfile, DoctorProfile
 from django.urls import reverse
 
+def assign_user_to_group(user):
+    role_to_group = {
+        'patient': 'Patient',
+        'doctor': 'Doctor',
+        'admin': 'Admin',
+        'receptionist': 'Receptionist'
+    }
+    group_name = role_to_group.get(user.role)
+    if group_name:
+        try:
+            group = Group.objects.get(name=group_name)
+            user.groups.add(group)
+        except Group.DoesNotExist:
+            pass  #run setup_groups_and_permissions to create groups and permissions
+
 def patient_register(request):
     if request.method == 'POST':
         form = PatientUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            assign_user_to_group(user)
             messages.success(request, 'Your account has been created successfully. You can now log in.')
             return redirect('login')
     else:
@@ -23,6 +40,7 @@ def admin_register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.save()
+            assign_user_to_group(user)
             if user.role == 'patient':
                 PatientProfile.objects.create(user=user)
             elif user.role == 'doctor':
@@ -153,7 +171,12 @@ def admin_edit_user(request, user_id):
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=user)
         if user_form.is_valid():
+            old_role = user.role
             user_form.save()
+            new_role = user.role            
+            if old_role != new_role:
+                user.groups.clear()
+                assign_user_to_group(user)
             is_active = request.POST.get('is_active') == 'on'
             user.is_active = is_active
             user.save()
