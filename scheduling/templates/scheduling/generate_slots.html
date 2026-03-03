@@ -126,6 +126,13 @@
           </div>
         </form>
       </div>
+
+      
+      {% if request.user.role == "receptionist" %}
+    <a href="{% url 'recep_dashboard' %}" class="btn btn-dark">
+        ✅ Finish slot generation
+    </a>
+{% endif %}
     </div>
   </body>
 </html>
