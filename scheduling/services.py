@@ -4,7 +4,7 @@
 
 from datetime import date, datetime, timedelta
 from .models import Availability, Slot, DoctorException
-from appointments.models import Appointment , RescheduleHistory
+from django.core.exceptions import ValidationError
 
 # get the days available between the start date and end date of the doctor
 def get_days_between(start_date, end_date):
@@ -27,14 +27,23 @@ def get_days_between(start_date, end_date):
 
 
 #  get doctor unavailable days from doctor exceptions
-def doctor_unavailable_days(doctor, date):
-    return DoctorException.objects.filter(doctor=doctor, date=date, is_available=False).exists()
-
+# def doctor_unavailable_days(doctor, date):
+#     return DoctorException.objects.filter(doctor=doctor, date=date, is_available=False).exists()
+def doctor_unavailable_days(doctor, slot_date):
+    if isinstance(slot_date, datetime):
+        slot_date = slot_date.date()
+    result = DoctorException.objects.filter(
+        doctor=doctor,
+        date=slot_date,
+        is_available=False
+    ).exists()
+    print(f"Checking exceptions for {doctor.username} on {slot_date}: {result}")
+    return result
 
 # generate slots for a doctor based on his availability and exceptions
 def generate_slots_for_doctor(doctor, date):
     if doctor_unavailable_days(doctor,date):
-        return []
+        return 0
     
     # doctor is available on this day - check availability table
     day_of_week = date.strftime('%A').upper()

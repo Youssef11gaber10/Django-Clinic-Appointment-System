@@ -2,14 +2,18 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from scheduling.models import Availability, Slot
+from scheduling.models import Availability, Slot, DoctorException
+from .form import GenerateSlotsForm, AvailabilityForm, DoctorExceptionForm
+from scheduling.models import Availability
 from .form import GenerateSlotsForm, AvailabilityForm
 from .services import slot_generator
 from django.contrib.auth import get_user_model
+from datetime import datetime
 
 User = get_user_model()
 
 def receptionist_required(view_func):
+
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             messages.error(request, 'You must be logged in to access this page.')
@@ -24,21 +28,16 @@ def receptionist_required(view_func):
 def generate_slots_view(request):
     if request.method == 'POST':
       form = GenerateSlotsForm(request.POST)
-      
       form.fields['doctor'].queryset = User.objects.filter(role='doctor')
-
 
       if form.is_valid():
         doctor = form.cleaned_data['doctor']
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
-
-        if end_date < start_date:
-           messages.error(request, "End date must be after start date")
-        else:
-           slots_count = slot_generator(doctor, start_date, end_date)
-           messages.success(request,f"Generated ${slots_count} successfully")
-           return redirect('scheduling:generate_slots')
+    
+        slots_count = slot_generator(doctor, start_date, end_date)
+        messages.success(request,f"Generated {slots_count} successfully")
+        return redirect('scheduling:generate_slots')
     else:
         form = GenerateSlotsForm()
         form.fields['doctor'].queryset = User.objects.filter(role='doctor')
@@ -83,4 +82,48 @@ def availability_delete(request, pk):
         obj.delete()
         messages.success(request, 'Availability removed.')
         return redirect('scheduling:availability_list')
+    return render(request, 'scheduling/availability_list.html', {'object': obj})
+
+# exception views
+@receptionist_required
+def exception_list(request):
+    exceptions = DoctorException.objects.all().select_related('doctor')
+    return render(request, 'scheduling/exception_list.html',{
+        'exceptions': exceptions,
+    })
+
+@receptionist_required
+def exception_add(request):
+    if request.method == "POST":
+        form = DoctorExceptionForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.save()
+
+            exception_date = obj.date
+            if isinstance(exception_date, datetime):
+                exception_date = exception_date.date()
+
+            Slot.objects.filter(
+                doctor=obj.doctor,
+                start_time__date=exception_date
+            ).update(is_available=False)
+
+            messages.success(request, "Exception added successfully")
+            return redirect('scheduling:exception_list')
+    else:
+        form = DoctorExceptionForm()
+
+    return render(request, 'scheduling/exception_form.html',{
+        'form':form,
+        'title' : 'Add Exception'
+    })
+
+@receptionist_required
+def exception_delete(request, pk):
+    obj = get_object_or_404(DoctorException, pk=pk)
+    if request.method == "POST":
+        obj.delete()
+        messages.success(request, "Exception removed")
+        return redirect("scheduling:exception_list")
     return render(request, 'scheduling/availability_list.html', {'object': obj})
