@@ -2,7 +2,7 @@
 
 {% load static %}
 
-
+{% block title %}Receptionist Dashboard · MediCare{% endblock %}
  
 </head>
 {% block extra_styles %}
@@ -27,13 +27,17 @@
     .confirmed { background:#1a6180; color:white; }
   </style>
 {% endblock %}
+{% block nav_tabs %}
+<button class="nav-tab active">schedule</button>
+<button class="nav-tab active">queue</button>
+{% endblock %}
 
 {% block content %}
 <div class="container">
   <!-- Header -->
-  <div class="header">
+  <!-- <div class="header">
     <h1>Receptionist Dashboard</h1>
-  </div>
+  </div> -->
 
   <!-- Select Doctor -->
   <div class="section">
@@ -57,6 +61,9 @@
       </a>
       <a href="{% url 'scheduling:generate_slots' %}?doctor={{ selected_doctor.id }}" style="text-decoration:none;">
         <button type="button">⚙ Generate Slots</button>
+      </a>
+        <a href="{% url 'scheduling:exception_add' %}?doctor={{ selected_doctor.id }}" style="text-decoration:none; margin: left 10px;">
+        <button type="button">Add Exception Day</button>
       </a>
     </div>
     {% endif %}
