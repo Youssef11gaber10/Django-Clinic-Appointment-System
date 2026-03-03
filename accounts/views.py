@@ -3,10 +3,16 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
 from django.contrib import messages
+from django.contrib.auth.views import (
+    PasswordResetView as AuthPasswordResetView,
+    PasswordResetDoneView as AuthPasswordResetDoneView,
+    PasswordResetConfirmView as AuthPasswordResetConfirmView,
+    PasswordResetCompleteView as AuthPasswordResetCompleteView,
+)
 from .forms import PatientUserCreationForm, BaseUserCreationForm, PatientProfileUpdateForm, UserUpdateForm, DoctorProfileUpdateForm 
 from .models import UserApp as User, PatientProfile, DoctorProfile
 from django_email_verification import send_email
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 def assign_user_to_group(user):
     role_to_group = {
@@ -89,21 +95,6 @@ def user_logout(request):
     logout(request)
     messages.info(request, 'You have been logged out.')
     return redirect('login')
-
-def forgot_password(request):
-    context = {}
-    if request.method == 'POST':
-        try:
-            username = request.POST.get('username', '')
-            new_password = request.POST.get('new_password', '')
-            user = User.objects.get(username=username)
-            user.set_password(new_password)
-            user.save()
-            messages.success(request, 'Your password has been reset successfully. You can now log in with your new password.')
-            return redirect('login')
-        except User.DoesNotExist:
-            messages.error(request, f'No account found for username: {username}')
-    return render(request, 'registration/forgot_password.html', context)
 
 @login_required(login_url='login')
 def profile(request):
@@ -203,6 +194,7 @@ def admin_edit_user(request, user_id):
         'is_admin_edit': True,
         'redirect_to': reverse('users_list')
     })
+    
 def admin_delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -212,3 +204,22 @@ def admin_delete_user(request, user_id):
     except User.DoesNotExist:
         messages.error(request, 'User not found.')
     return redirect('users_list')
+
+class PasswordResetView(AuthPasswordResetView):
+    template_name = 'password/password_reset_form.html'
+    email_template_name = 'registration/emails/password_reset_email.html'
+    subject_template_name = 'registration/emails/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+
+
+class PasswordResetDoneView(AuthPasswordResetDoneView):
+    template_name = 'password/password_reset_done.html'
+
+
+class PasswordResetConfirmView(AuthPasswordResetConfirmView):
+    template_name = 'password/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+
+class PasswordResetCompleteView(AuthPasswordResetCompleteView):
+    template_name = 'password/password_reset_complete.html'
