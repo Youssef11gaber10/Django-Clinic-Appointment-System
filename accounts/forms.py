@@ -41,6 +41,11 @@ class PatientUserCreationForm(BaseUserCreationForm):
         widget=forms.DateInput(attrs={'type': 'date'}), required=True)
     address = forms.CharField(max_length=255, required=True)
     gender = forms.ChoiceField(choices=[('male', 'Male'), ('female', 'Female')], required=True)
+    
+    class Meta:
+        model = UserApp
+        fields = ['username', 'email', 'password1', 'password2', 'phone_number', 'first_name', 'last_name', 'date_of_birth', 'address', 'gender']
+    
     def clean_date_of_birth(self):
         date_of_birth = self.cleaned_data.get('date_of_birth')
         if date_of_birth:
