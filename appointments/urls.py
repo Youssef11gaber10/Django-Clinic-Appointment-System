@@ -8,7 +8,6 @@ urlpatterns = [
     path("book/<int:slot_id>/", book_appointment, name="book_appointment"),
     path("cancel/<int:appointment_id>/",cancel_appointment, name="cancel_appointment"),
     path("appointments/<int:appointment_id>/reschedule/",reschedule_appointment,name="reschedule"),
-    path("doctors/", doctor_list, name="doctor_list"),
     path("doctors/<int:doctor_id>/slots", doctor_slots, name="doctor_slots"),
     # Receptionist 
     path("confirm/<int:appointment_id>/", confirm_appointment, name="confirm_appointment"),

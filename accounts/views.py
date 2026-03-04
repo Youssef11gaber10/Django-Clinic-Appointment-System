@@ -88,6 +88,8 @@ def user_login(request):
                     return render(request, 'registration/login.html', context)
                 login(request, user)
                 messages.success(request, f'Welcome back, {username}!')
+                if user.role == 'patient':
+                    return redirect('doctor_list')
                 return redirect('/accounts/profile/')  
             else:
                 messages.error(request, f'Invalid credentials for user: {username}')

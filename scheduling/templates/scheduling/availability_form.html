@@ -1,12 +1,6 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {% if title %}{{ title }}{% else %}Add availability{% endif %} ·
-      Scheduling
-    </title>
+{% extends "dashboard/base.html" %}
+
+    {% block extra_styles %}
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -102,8 +96,9 @@
         font-size: 0.9rem;
       }
     </style>
-  </head>
-  <body>
+    {% endblock extra_styles %}
+
+    {% block content %}
     <div class="container">
       <div class="back-link"></div>
       <div class="page-header">
@@ -139,5 +134,5 @@
         </form>
       </div>
     </div>
+    {% endblock content %}
   </body>
-</html>

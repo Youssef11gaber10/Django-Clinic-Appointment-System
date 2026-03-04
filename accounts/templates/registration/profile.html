@@ -387,6 +387,7 @@
         <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
         {% if user.role == 'patient' %}
           <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
+          <a href="{% url 'doctor_list' %}" class="btn btn-secondary">Find Doctors</a>
         {% elif user.role == 'doctor' %}
           <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary">View Dashboard</a>
         {% elif user.role == 'admin' %}

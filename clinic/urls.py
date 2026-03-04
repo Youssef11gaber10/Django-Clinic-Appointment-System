@@ -3,8 +3,10 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
+from appointments.views import doctor_list
 
 urlpatterns = [
+    path("", doctor_list, name="doctor_list"),
     path('admin/', admin.site.urls),
     path('verify/', include('django_email_verification.urls')),
     path('accounts/', include('accounts.urls')),

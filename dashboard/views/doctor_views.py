@@ -2,9 +2,9 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from appointments.models import Appointment
 from django.utils import timezone
-from django.db.models import Q
+from django.db.models import Q  
 
-## None here if he want to get all histoy 
+from accounts.permissions import require_role
 def get_appointments(doctor_id, statuses, date = None):
     return (
         Appointment.objects
@@ -21,7 +21,8 @@ def get_all_completed_appointments(doctor_id):
     return Appointment.objects.filter(doctor_id=doctor_id, status=Appointment.COMPLETED)
 
 
-@login_required
+@login_required(login_url='login')
+@require_role('doctor')
 def doctor_dashboard(request):
 
     today = timezone.localdate()
@@ -55,7 +56,7 @@ def doctor_dashboard(request):
 
     context = {
         "active_tab": tab,
-        "appointments": queryset,
+        "appointments": queryset
     }
 
     return render(request, "dashboard/doctor_dashboard.html", context)

@@ -5,56 +5,353 @@
 {% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
 
 {% block content %}
-<div class="pg-header">
-    <h1>Available Slots for <em>Dr. {{ doctor.user.get_full_name }}</em></h1>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+  .back-link {
+    margin-bottom: 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    background-color: #040452;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 300;
+    text-decoration: none;
+
+  }
+  .slots-page {
+    font-family: 'DM Sans', sans-serif;
+    padding: 2rem 0 5rem;
+  }
+
+  /* ─── Doctor Hero ─── */
+  .doctor-hero {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: #1a1a2e;
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 3rem;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .doctor-hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.03);
+    pointer-events: none;
+  }
+
+  .doctor-hero-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.15);
+    flex-shrink: 0;
+    background: #2d2d4e;
+  }
+
+  .doctor-hero-info {
+    flex: 1;
+  }
+
+  .doctor-hero-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.4px;
+  }
+
+  .spec-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 0.5rem;
+  }
+
+  .doctor-hero-info .bio {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.45);
+    font-weight: 300;
+    margin: 0;
+  }
+
+  .doctor-hero-price {
+    text-align: right;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    padding-left: 2rem;
+  }
+
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .price-label {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    font-weight: 300;
+    margin-top: 4px;
+  }
+
+  /* ─── Page header ─── */
+  .slots-subheader {
+    margin-bottom: 2.5rem;
+  }
+
+  .slots-subheader h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem;
+  }
+
+  .slots-subheader p {
+    color: #9ca3af;
+    font-size: 0.88rem;
+    font-weight: 300;
+    margin: 0;
+  }
+
+  /* ─── Day section ─── */
+  .day-group {
+    margin-bottom: 3rem;
+  }
+
+  .day-header {
+    background-color: #040452;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .day-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    padding-left: 1.5rem;
+    white-space: nowrap;
+    color: #fff;
+  }
+
+  .day-date {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    font-weight: 300;
+  }
+
+  .day-divider {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, #d1d5db, transparent);
+  }
+
+  .day-count {
+    font-size: 1.2rem;
+    color: #1a1a2e;
+    background-color: #fff;
+    padding: 0.8rem;
+    border-radius: 10px;
+  }
+
+  /* ─── Slot grid ─── */
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  /* ─── Slot card ─── */
+  .slot-card {
+    background: #fff;
+    border: 1px solid #e8ecf0;
+    border-radius: 18px;
+    padding: 1.1rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  .slot-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(26,26,46,0.1);
+    border-color: #a5b4fc;
+  }
+
+  .slot-card-time {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a2e;
+    letter-spacing: -0.4px;
+    line-height: 1.3;
+  }
+
+  .slot-card-time .end-time {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    font-weight: 300;
+    display: block;
+    margin-top: 1px;
+  }
+
+  .slot-card-price {
+    font-size: 0.78rem;
+    color: #6b7280;
+    font-weight: 400;
+  }
+
+  .slot-book-btn {
+    display: block;
+    width: 100%;
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.55rem 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: background 0.18s ease, transform 0.15s ease;
+    letter-spacing: 0.2px;
+    margin-top: auto;
+  }
+
+  .slot-book-btn:hover {
+    background: #2d2d4e;
+    transform: scale(1.02);
+  }
+
+  /* ─── Empty state ─── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6rem 2rem;
+    text-align: center;
+    gap: 1rem;
+    color: #9ca3af;
+  }
+
+  .empty-state svg {
+    width: 56px;
+    height: 56px;
+    fill: #e5e7eb;
+  }
+
+  .empty-state p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 300;
+  }
+
+  .empty-state a {
+    color: #1a1a2e;
+    font-weight: 500;
+    font-size: 0.88rem;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+  }
+</style>
+
+
+
+<a href="{% url 'doctor_list' %}" class="back-link">← Back to Doctors</a>
+
+<div class="slots-page">
+                                  
+
+  <!-- Doctor hero -->
+  <div class="doctor-hero">
+    <img
+      class="doctor-hero-img"
+      src="{% static 'images/default_doctor.jpg' %}"
+      alt="Dr. {{ doctor.user.get_full_name }}"
+      onerror="this.style.opacity='0.2'"
+    >
+    <div class="doctor-hero-info">
+      <h2>Dr. {{ doctor.user.get_full_name }}</h2>
+      <span class="spec-tag">{{ doctor.specialization }}</span>
+      {% if doctor.bio %}<p class="bio">{{ doctor.bio|slice:":80" }}…</p>{% endif %}
+    </div>
+    <div class="doctor-hero-price">
+      <div class="price-amount">{{ doctor.session_price }}</div>
+      <div class="price-label">EGP / session</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="slots-subheader">
+    <h1>Available Slots</h1>
     <p>Select a convenient time to book your appointment.</p>
-</div>
+  </div>
 
-{% if slots %}
-    {% for slot in slots %}
-    <div class="appt-card">
-        <div class="appt-card-band">
-            <div class="appt-band-left">
-                <div class="appt-date-badge">
-                    <div class="day">{{ slot.start_time|date:"d" }}</div>
-                    <div class="mon">{{ slot.start_time|date:"M" }}</div>
-                </div>
+  {% if slots %}
+    {% regroup slots by start_time.date as day_groups %}
 
-                <div class="appt-band-title">
-                    <h3>
-                        {{ slot.start_time|time:"H:i" }} -
-                        {{ slot.end_time|time:"H:i" }}
-                    </h3>
-                    <p>{{ doctor.specialization }}</p>
-                    <p>{{ doctor.session_price }} EGP</p>
-                </div>
-            </div>
+    {% for day in day_groups %}
+    <div class="day-group">
 
-            <div class="band-right">
-                <!-- Booking Form -->
-                <form method="post" action="{% url 'appointments:doctor_slots' doctor.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="slot_id" value="{{ slot.id }}">
-                    <button type="submit" class="btn btn-dark">
-                        Book
-                    </button>
-                </form>
-            </div>
+      <div class="day-header">
+        <span class="day-title">{{ day.grouper|date}}</span>
+        <div class="day-divider"></div>
+        <span class="day-count">{{ day.list|length }} slot{{ day.list|length|pluralize }}</span>
+      </div>
 
+      <div class="slots-grid">
+        {% for slot in day.list %}
+        <div class="slot-card">
+          <div class="slot-card-time">
+            {{ slot.start_time|time:"H:i" }}
+            <span class="end-time">until {{ slot.end_time|time:"H:i" }}</span>
+          </div>
+          <div class="slot-card-price">{{ doctor.session_price }} EGP</div>
+          <form method="post" action="{% url 'appointments:doctor_slots' doctor.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="slot_id" value="{{ slot.id }}">
+            <button type="submit" class="slot-book-btn">Book Now</button>
+          </form>
         </div>
+        {% endfor %}
+      </div>
+
     </div>
     {% endfor %}
-{% else %}
-<div class="empty-state">
-    <svg viewBox="0 0 24 24">
-        <path
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z" />
-    </svg>
-    <p>No available slots for this doctor at the moment.</p>
-    <a href="{% url 'appointments:doctor_list' %}">
-        Choose another doctor →
-    </a>
+
+  {% else %}
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z"/></svg>
+      <p>No available slots for this doctor at the moment.</p>
+      <a href="{% url 'doctor_list' %}">Choose another doctor →</a>
+    </div>
+  {% endif %}
+
 </div>
-{% endif %}
 
 {% endblock %}

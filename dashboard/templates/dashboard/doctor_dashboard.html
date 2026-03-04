@@ -3,6 +3,14 @@
 
 {% block title %}Doctor Dashboard · MediCare{% endblock %}
 
+
+{% block extra_styles %}
+<style>
+  .nav-tab { 
+    text-decoration: none;
+    }
+</style>
+{% endblock %}
 {% block nav_tabs %}
   <a href="?tab=queue"
      class="nav-tab {% if active_tab == 'queue' %}active{% endif %}">

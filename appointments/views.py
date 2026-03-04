@@ -9,7 +9,7 @@ from accounts.models import DoctorProfile
 from django.contrib.auth.decorators import login_required
 from accounts.permissions import require_role
 from django.db import transaction
-
+from django.db.models import Q
 @login_required(login_url='login')
 @require_role('patient')
 def book_appointment(request, slot_id):
@@ -125,7 +125,18 @@ def complete_appointment(request, appointment_id):
 @login_required(login_url='login')
 @require_role('patient')
 def doctor_list(request):
-    doctors = DoctorProfile.objects.all()
+
+    search = request.GET.get('search')
+    doctors = None
+    if search:
+        doctors = DoctorProfile.objects.filter(
+            Q(user__first_name__icontains=search) |
+            Q(user__last_name__icontains=search)
+        )
+    else:
+        doctors = DoctorProfile.objects.all()
+
+
     return render(request , "appointments/doctor_list.html" , {"doctors": doctors})
 
 @login_required(login_url='login')
@@ -133,6 +144,7 @@ def doctor_list(request):
 @transaction.atomic
 def doctor_slots(request, doctor_id):
     doctor_profile = get_object_or_404(DoctorProfile, id=doctor_id)
+    print(doctor_profile.specialization)
     doctor_user = doctor_profile.user 
 
     if request.method == "POST":
