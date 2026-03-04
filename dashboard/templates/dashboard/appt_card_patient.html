@@ -89,7 +89,6 @@
 
     <!-- Actions -->
     <div class="appt-actions-col">
-      {% if is_previous %}
       {% if appt.consultation %}
       <a href="{% url 'view_summary' appt.consultation.id %}" style="text-decoration:none;" class="btn btn-dark">👁 View
         Consultation</a>
