@@ -4,84 +4,81 @@
 {% block title %}Doctor Dashboard · MediCare{% endblock %}
 
 {% block nav_tabs %}
-  <button class="nav-tab active" onclick="switchTab('queue', this)">
-    Today's Queue <span class="tab-count">{{ today_queue|length }}</span>
-  </button>
-  <button class="nav-tab" onclick="switchTab('completed', this)">
-    Completed <span class="tab-count">{{ compiled_appointments|length }}</span>
-  </button>
+  <a href="?tab=queue"
+     class="nav-tab {% if active_tab == 'queue' %}active{% endif %}">
+     Today's Queue {% if active_tab == 'queue' %}({{ appointments|length }}){% endif %}
+  </a>
+
+  <a href="?tab=completed"
+     class="nav-tab {% if active_tab == 'completed' %}active{% endif %}">
+     Completed Today {% if active_tab == 'completed' %}({{ appointments|length }}){% endif %}
+  </a>
+
+  <a href="?tab=all-completed"
+     class="nav-tab {% if active_tab == 'all-completed' %}active{% endif %}">
+     All Completed {% if active_tab == 'all-completed' %}({{ appointments|length }}){% endif %}
+  </a>
 {% endblock %}
 
 {% block content %}
 
-  <!-- ── Page header ── -->
+  <!-- ── Page Header ── -->
   <div class="pg-header">
-    <h1>Welcome, <em>Dr. {{ user.get_full_name }}</em> 👨‍⚕️</h1>
-    <p>
-      {{ user.doctor_profile.specialization }} &nbsp;·&nbsp;
-      {% now "l, d M Y" %} &nbsp;·&nbsp;
-      Session: {{ user.doctor_profile.session_duration }} min
-    </p>
+    <div>
+      <h1>Welcome, <em>Dr. {{ user.get_full_name }}</em> 👨‍⚕️</h1>
+      <p>
+        {{ user.doctor_profile.specialization }} &nbsp;·&nbsp;
+        {% now "l, d M Y" %} &nbsp;·&nbsp;
+        Session: {{ user.doctor_profile.session_duration }} min
+      </p>
+    </div>
+    <div>
+              <!-- 🔎 Search Form -->
+        <form method="GET" class="search-form" style="margin-bottom: 20px;">
+          <!-- keep active tab -->
+          <input type="hidden" name="tab" value="{{ active_tab }}">
+          
+          <input type="text"
+          name="search"
+          placeholder="Search patient..."
+          value="{{ request.GET.search }}"
+          class="search-input">
+          
+          <button type="submit" class="search-btn">
+            Search
+          </button>
+        </form>
+    </div>
   </div>
 
-  <!-- ══════════════════════════════
-       TAB 1 · TODAY'S QUEUE
-  ══════════════════════════════ -->
-  <div id="tab-queue" class="tab-panel active">
-    <section>
-      <div class="sec-head">
-        Today's Queue
-        <span>Ordered by appointment time</span>
-      </div>
+  <!-- ── Appointments Section ── -->
+  <section >
 
-      {% if today_queue %}
-        {% for appt in today_queue %}
-          {% include "dashboard/appt_card_doctor.html" with appt=appt show_queue=True loop_counter=forloop.counter %}
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
-          <p>No patients existed now.</p>
+       <div class="sec-head">
+         {{ section_title }}
+         <span>
+           {{ appointments|length }}
+           session{% if appointments|length != 1 %}s{% endif %}
+          </span>
         </div>
-      {% endif %}
-    </section>
-  </div>
-
-  <!-- ══════════════════════════════
-       TAB 2 · COMPLETED
-  ══════════════════════════════ -->
-  <div id="tab-completed" class="tab-panel">
-    <section>
-      <div class="sec-head">
-        Completed Today
-        <span>
-          {{ compiled_appointments|length }}
-          session{% if compiled_appointments|length != 1 %}s{% endif %} done
-        </span>
+        
+    <!-- Appointments List -->
+    {% if appointments %}
+      {% for appt in appointments %}
+        {% include "dashboard/appt_card_doctor.html" with appt=appt %}
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24">
+          <path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6
+                   c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7
+                   c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42
+                   A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18z"/>
+        </svg>
+        <p>No appointments found.</p>
       </div>
+    {% endif %}
 
-      {% if compiled_appointments %}
-        {% for appt in compiled_appointments %}
-          {% include "dashboard/appt_card_doctor.html" with appt=appt %}
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18z"/></svg>
-          <p>No completed appointments yet today.</p>
-        </div>
-      {% endif %}
-    </section>
-  </div>
+  </section>
 
-{% endblock %}
-
-{% block extra_scripts %}
-<script>
-  // Wire up No Show modal open helper (used inside appt_card partial)
-  function openNoShow(apptId, patientName) {
-    document.getElementById('noshow-name').textContent = patientName;
-    document.getElementById('noShowForm').action = '/appointments/' + apptId + '/no-show/';
-    document.getElementById('noShowModal').classList.add('open');
-  }
-</script>
 {% endblock %}

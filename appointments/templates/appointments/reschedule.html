@@ -1,25 +1,86 @@
-<h2>Reschedule Appointment</h2>
+{% extends "dashboard/base.html" %}
+{% load static %}
 
-<p>Current time: {{ appointment.slot.start_time }}</p>
+{% block title %}Reschedule Appointment · MediCare{% endblock %}
+{% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
 
-<form method="post">
-  {% csrf_token %}
+{% block content %}
 
-  <label>Select new slot:</label>
-  <select name="slot_id">
+<!-- ── Page header ── -->
+<div class="pg-header">
+    <h1>Reschedule Appointment with <em>Dr. {{ doctor.user.get_full_name }}</em></h1>
+    <p>Current slot: {{ appointment.slot.start_time|date:"d M Y H:i" }} – {{ appointment.slot.end_time|time:"H:i" }}</p>
+    <p>Select a new available slot below:</p>
+</div>
+
+<!-- ── Slots ── -->
+{% if available_slots %}
     {% for slot in available_slots %}
-      <option value="{{ slot.id }}">
-        {{ slot.start_time }}
-      </option>
+    <div class="appt-card">
+        <div class="appt-card-band">
+            <div class="appt-band-left">
+                <div class="appt-date-badge">
+                    <div class="day">{{ slot.start_time|date:"d" }}</div>
+                    <div class="mon">{{ slot.start_time|date:"M" }}</div>
+                </div>
+
+                <div class="appt-band-title">
+                    <h3>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</h3>
+                    <p>{{ doctor.specialization }}</p>
+                    <p>{{ doctor.session_price }} EGP</p>
+                </div>
+            </div>
+
+            <div class="band-right">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                    <input type="hidden" name="reason" value="Rescheduled via slot list">
+                    <button type="submit" class="btn btn-gold btn-thick">
+                        🔄 Reschedule
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
     {% endfor %}
-  </select>
+{% else %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z"/>
+        </svg>
+        <p>No available slots for this doctor at the moment.</p>
+        <a href="{% url 'patient_dashboard' %}">
+            Back to dashboard →
+        </a>
+    </div>
+{% endif %}
 
-  <br><br>
+{% endblock %}
 
-  <label>Reason:</label>
-  <textarea name="reason"></textarea>
+{% block extra_styles %}
+<style>
+/* Messages */
+.messages-container {
+    margin-bottom: 1rem;
+}
+.alert {
+    padding: 0.8rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.alert.error { background-color: #f8d7da; color: #842029; }
+.alert.success { background-color: #d1e7dd; color: #0f5132; }
 
-  <br><br>
-
-  <button type="submit">Confirm Reschedule</button>
-</form>
+/* Reschedule button thick and consistent */
+.btn-thick {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    min-width: 120px;
+}
+</style>
+{% endblock %}

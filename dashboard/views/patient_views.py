@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from appointments.models import Appointment, Slot   
 from accounts.models import DoctorProfile
+from accounts.permissions import require_role
+
 # ── Dummy Data ────────────────────────────────────────────────────────────────
 
 # userapps = [
@@ -76,9 +78,10 @@ def get_ppointments(patient_id, statuses):
 
 
 @login_required(login_url="login")
+@require_role('patient')
 def patient_dashboard(request):
 
-    upcoming_appointments = get_ppointments(request.user.id, ["requested", "confirmed"])
+    upcoming_appointments = get_ppointments(request.user.id, ["requested", "confirmed", "checked_in"])
     previous_appointments = get_ppointments(request.user.id, ["completed"])
     appointments_with_info = []
 

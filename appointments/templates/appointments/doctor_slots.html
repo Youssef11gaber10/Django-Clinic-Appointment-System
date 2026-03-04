@@ -1,0 +1,60 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Available Slots · MediCare{% endblock %}
+{% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
+
+{% block content %}
+<div class="pg-header">
+    <h1>Available Slots for <em>Dr. {{ doctor.user.get_full_name }}</em></h1>
+    <p>Select a convenient time to book your appointment.</p>
+</div>
+
+{% if slots %}
+    {% for slot in slots %}
+    <div class="appt-card">
+        <div class="appt-card-band">
+            <div class="appt-band-left">
+                <div class="appt-date-badge">
+                    <div class="day">{{ slot.start_time|date:"d" }}</div>
+                    <div class="mon">{{ slot.start_time|date:"M" }}</div>
+                </div>
+
+                <div class="appt-band-title">
+                    <h3>
+                        {{ slot.start_time|time:"H:i" }} -
+                        {{ slot.end_time|time:"H:i" }}
+                    </h3>
+                    <p>{{ doctor.specialization }}</p>
+                    <p>{{ doctor.session_price }} EGP</p>
+                </div>
+            </div>
+
+            <div class="band-right">
+                <!-- Booking Form -->
+                <form method="post" action="{% url 'appointments:doctor_slots' doctor.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="slot_id" value="{{ slot.id }}">
+                    <button type="submit" class="btn btn-dark">
+                        Book
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="empty-state">
+    <svg viewBox="0 0 24 24">
+        <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z" />
+    </svg>
+    <p>No available slots for this doctor at the moment.</p>
+    <a href="{% url 'appointments:doctor_list' %}">
+        Choose another doctor →
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

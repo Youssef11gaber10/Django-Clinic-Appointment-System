@@ -2,9 +2,13 @@ from django.shortcuts import render
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+import csv
+from django.http import HttpResponse
 
-from appointments.models import Appointment
+from appointments.models import Appointment, RescheduleHistory
 from accounts.models import UserApp
+from accounts.permissions import require_role
 
 
 def get_overall_appointment_metrics():
@@ -20,8 +24,8 @@ def get_overall_appointment_metrics():
 
 def get_doctor_appointment_metrics():
     return (
-        Appointment.objects
-        .values("doctor_id", "doctor__username")
+        Appointment.objects 
+        .values("doctor_id", "doctor__username", "doctor__first_name", "doctor__last_name")
         .annotate(
             total_appointments=Count("id"),
             completed_appointments=Count("id", filter=Q(status=Appointment.COMPLETED)),
@@ -79,17 +83,121 @@ def get_monthly_insights():
         )
     )
 
+def get_rescheduled_appointments():
+    return RescheduleHistory.objects.select_related(
+        "appointment",
+        "changed_by"
+    )
 
-
-# Analytics Dashboard View
-def analytics(request):
-    context = {
+def get_context():
+    return {
         "appointments_insights": get_overall_appointment_metrics(),
         "doctors_insights": get_doctor_appointment_metrics(),
         "total_doctors_patients": get_total_patients_doctors(),
         "daily_insights": get_daily_insights(),
         "monthly_insights": get_monthly_insights(),
+        "rescheduled_appointments": get_rescheduled_appointments(),
         "generated_at": timezone.now(),
     }
 
-    return render(request, "dashboard/analytics.html", context)
+
+
+# Analytics Dashboard View
+@login_required(login_url='login')
+@require_role('admin')
+def analytics(request):
+    return render(request, "dashboard/analytics.html", context=get_context())
+
+@login_required(login_url='login')
+@require_role('admin')
+def export_csv(request):
+    response = HttpResponse(
+    content_type="text/csv",
+    headers={
+        "Content-Disposition": 'inline; filename="clinic-analytics.csv"'
+        },
+    )   
+    all_analytics = get_context()
+
+
+    writer = csv.writer(response)
+    writer.writerow(["Generated At", all_analytics["generated_at"]])
+    writer.writerow([""])
+
+    writer.writerow(["Total Patients", all_analytics["total_doctors_patients"]["total_patients"]])
+    writer.writerow(["Total Doctors", all_analytics["total_doctors_patients"]["total_doctors"]])
+
+    writer.writerow([""])
+    writer.writerow(["Appointments Insights"])
+    appts_insights = all_analytics["appointments_insights"]
+    for key, value in appts_insights.items():
+        writer.writerow([ "  ", key, value])
+
+    writer.writerow([""])
+    writer.writerow(["Doctors Insights"])
+    doctors_insights = all_analytics["doctors_insights"]
+    writer.writerow(["Id", "Username", "First Name", "Last Name", "Total Appointments", "Completed Appointments", "Cancelled Appointments", "No Show Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"])
+    for doctor in doctors_insights:
+        writer.writerow([
+            doctor["doctor_id"],
+            doctor["doctor__username"],
+            doctor["doctor__first_name"],
+            doctor["doctor__last_name"],
+            doctor["total_appointments"],
+            doctor["completed_appointments"],
+            doctor["cancelled_appointments"],
+            doctor["no_show_appointments"],
+            doctor["requested_appointments"],
+            doctor["confirmed_appointments"],
+            doctor["checked_in_appointments"],
+    ])
+    writer.writerow([""])
+    writer.writerow(["Daily Insights"])
+    daily_insights = all_analytics["daily_insights"]
+    writer.writerow(["Day", "Total Appointments", "Completed Appointments", "Cancelled Appointments", "No Show Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"])
+    for insight in daily_insights:
+        writer.writerow([
+            insight["day"].strftime("%Y %B %d"),
+            insight["total_appointments"],
+            insight["completed_appointments"],
+            insight["cancelled_appointments"],
+            insight["no_show_appointments"],
+            insight["requested_appointments"],
+            insight["confirmed_appointments"],
+            insight["checked_in_appointments"],
+    ])
+
+    writer.writerow([""])
+    writer.writerow(["Monthly Insights"])
+    monthly_insights = all_analytics["monthly_insights"]
+    writer.writerow(["Month", "Total Appointments", "Completed Appointments", "Cancelled Appointments", "No Show Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"])
+    print(monthly_insights)
+    for insight in monthly_insights:
+        writer.writerow([
+            insight["month"].strftime("%Y %B"),
+            insight["total_appointments"],
+            insight["completed_appointments"],
+            insight["cancelled_appointments"],
+            insight["no_show_appointments"],
+            insight["requested_appointments"],
+            insight["confirmed_appointments"],
+            insight["checked_in_appointments"],
+        ])
+
+    writer.writerow([""])
+    writer.writerow(["Rescheduled Appointments"])
+    rescheduled_appointments = all_analytics["rescheduled_appointments"]
+    print(rescheduled_appointments)
+    writer.writerow(["Appointment ID", "Old Date-Time", "New Date-Time", "Changed By", "Reason", "Logged At"])
+    for reschedule in rescheduled_appointments:
+        writer.writerow([
+        reschedule.appointment.id,
+        reschedule.old_start_datetime.strftime("%Y %B %d %I:%M %p"),
+        reschedule.new_start_datetime.strftime("%Y %B %d %I:%M %p"),
+        reschedule.changed_by.username,
+        reschedule.reason,
+        reschedule.timestamp.strftime("%Y %B %d"),
+    ])   
+    
+   
+    return response
