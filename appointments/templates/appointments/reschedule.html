@@ -13,17 +13,6 @@
     <p>Select a new available slot below:</p>
 </div>
 
-<!-- ── Messages ── -->
-{% if messages %}
-  <div class="messages-container">
-    {% for message in messages %}
-      <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
 <!-- ── Slots ── -->
 {% if available_slots %}
     {% for slot in available_slots %}

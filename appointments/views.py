@@ -20,16 +20,17 @@ def book_appointment(request, slot_id):
         try:
             Appointment.request_appointment(slot, request.user)
             messages.success(request, "Appointment booked successfully.")
-        except Exception as e:
-            print("ERROR:", e)
+        except (ValidationError, PermissionDenied) as e:
+            messages.error(request, str(e))
             raise e
     return redirect("patient_dashboard")
 
 @login_required(login_url='login')
 @require_role('patient')
 def cancel_appointment(request, appointment_id):
-    if request.method == "POST":
-        appointment = get_object_or_404(Appointment, id=appointment_id)
+    if request.method != "POST":
+        return redirect("patient_dashboard")
+    appointment = get_object_or_404(Appointment, id=appointment_id)
     try:
         appointment.cancel_appointment(request.user)
         messages.success(request, "Appointment cancelled successfully.")
@@ -83,11 +84,11 @@ def complete_appointment(request, appointment_id):
     return redirect("doctor_dashboard")
 
 
-@login_required(login_url='login')
-@require_role('patient')
-def slot_list(request):
-    slots = Slot.objects.filter(is_available=True)
-    return render(request, "appointments/view_Slot.html", {"slots": slots})
+# @login_required(login_url='login')
+# @require_role('patient')
+# def slot_list(request):
+#     slots = Slot.objects.filter(is_available=True)
+#     return render(request, "appointments/view_Slot.html", {"slots": slots})
 
 
 
