@@ -22,13 +22,14 @@
 {% block content %}
   <div class="pg-header">
     <h1>Appointments <em>Analytics</em> 📊</h1>
-    <p>Overall system-wide appointment metrics and doctor performance.</p>
+    <a href="{% url 'export_csv' %}" style="width: fit-content;" class="export-btn">Export CSV</a>
   </div>
 
   {% include "dashboard/analytics_tabs/tab_overview.html" %}
   {% include "dashboard/analytics_tabs/tab_doctors.html" %}
   {% include "dashboard/analytics_tabs/tab_reschedules.html" %}
   {% include "dashboard/analytics_tabs/tab_insights.html" %}
+
 {% endblock %}
 
 {% block extra_scripts %}

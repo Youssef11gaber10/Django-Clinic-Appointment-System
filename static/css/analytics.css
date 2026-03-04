@@ -220,3 +220,26 @@
   .data-table        { display: block; overflow-x: auto; }
   .reschedule-reason { max-width: 140px; }
 }
+
+
+.export-btn{
+  font-size: 1rem;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all .14s;
+  text-align: center;
+  width: 100%;
+  display: inline-block;
+  text-decoration: none;
+  background: var(--sidebar-bg);
+  color: #fff;
+}
+.export-btn:hover{
+  color: var(--sidebar-bg);
+  background: #fff;
+  border: solid 1px var(--sidebar-bg);
+}
