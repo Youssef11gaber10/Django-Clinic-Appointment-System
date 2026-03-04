@@ -77,7 +77,7 @@ class DoctorExceptionForm(forms.ModelForm):
         cleaned_data = super().clean()
         date = cleaned_data.get('date')
 
-        if date < timezone.now().date():
+        if date <= timezone.now().date():
             raise ValidationError("You can't set exception in the past")
         
     def __init__(self, *args, **kwargs):
