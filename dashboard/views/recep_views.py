@@ -54,7 +54,6 @@ def todays_queue(request):
 
     today = timezone.localdate()
 
-    # لو ضغط زرار
     if request.method == "POST":
         appointment_id = request.POST.get("appointment_id")
         action = request.POST.get("action")
@@ -67,9 +66,8 @@ def todays_queue(request):
         elif action == "no_show":
             appointment.mark_no_show(request.user)
 
-        return redirect("dashboard:todays_queue")
+        return redirect("todays_queue")
 
-    # كل مواعيد النهارده
     appointments = Appointment.objects.filter(
         slot__start_time__date=today,
         status__in=["confirmed", "checked_in", "no_show"]

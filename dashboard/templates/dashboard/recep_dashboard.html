@@ -28,8 +28,13 @@
   </style>
 {% endblock %}
 {% block nav_tabs %}
-<button class="nav-tab active">schedule</button>
-<button class="nav-tab active">queue</button>
+<button class="nav-tab {% if request.path == '/dashboard/recep_dashboard.html' %}active{% endif %}" onclick="window.location.href='{% url 'recep_dashboard' %}'">
+  Schedule
+</button>
+
+<button class="nav-tab {% if request.path == '/dashboard/today_queue.html' %}active{% endif %}"  onclick="window.location.href='{% url 'todays_queue' %}'">
+  Queue 
+</button>
 {% endblock %}
 
 {% block content %}
@@ -97,51 +102,55 @@
     </table>
   </div>
 
+  
   <!-- Slots -->
-  <div class="section">
-    <h2>Slots</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for slot in slots %}
-        <tr>
-          <td>{{ slot.date|default:slot.start_time|date:"M d, Y" }}</td>
-          <td>{{ slot.start_time|time:"h:i a" }} - {{ slot.end_time|time:"h:i a" }}</td>
+<div class="section">
+  <h2>Slots</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for slot in slots %}
+      <tr>
+        <td>{{ slot.date|default:slot.start_time|date:"M d, Y" }}</td>
+        <td>{{ slot.start_time|time:"h:i a" }} - {{ slot.end_time|time:"h:i a" }}</td>
 
-          <td>
-  {% if slot.is_available %}
-    <span class="badge available">Available</span>
-  {% else %}
-    {% for app in slot.appointments.all %}
-      {% if app.status == "confirmed" %}
-        <span class="badge confirmed">Confirmed</span>
-      {% elif app.status == "requested" %}
-        <span class="badge booked">Requested</span>
-        <form method="post" action="{% url 'appointments:confirm_appointment' app.id %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" style="padding:4px 8px; margin-left:5px; font-size:.75rem; border-radius:8px; background:#1a6180; color:white; border:none; cursor:pointer;">Confirm</button>
-        </form>
-      {% else %}
-        <span class="badge booked">{{ app.status|capfirst }}</span>
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-</td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="3">No slots yet</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+        <td>
+          {% if slot.is_exception %}
+            <span class="badge booked" style="background:#f44336; color:white;">Exception</span>
+          {% elif slot.is_available %}
+            <span class="badge available">Available</span>
+          {% else %}
+            {% for app in slot.appointments.all %}
+              {% if app.status == "confirmed" %}
+                <span class="badge confirmed">Confirmed</span>
+              {% elif app.status == "requested" %}
+                <span class="badge booked">Requested</span>
+                <form method="post" action="{% url 'appointments:confirm_appointment' app.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" style="padding:4px 8px; margin-left:5px; font-size:.75rem; border-radius:8px; background:#1a6180; color:white; border:none; cursor:pointer;">Confirm</button>
+                </form>
+              {% else %}
+                <span class="badge booked">{{ app.status|capfirst }}</span>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No slots yet</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
   {% endif %}
 </div>
 

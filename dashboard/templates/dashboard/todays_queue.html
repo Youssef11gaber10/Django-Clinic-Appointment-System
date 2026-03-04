@@ -1,91 +1,180 @@
 {% extends "dashboard/base.html" %}
+{% load static %}
 
-{% block title %}Today's Queue{% endblock %}
+{% block title %}Receptionist Dashboard · MediCare{% endblock %}
+
+{% block nav_tabs %}
+<button class="nav-tab {% if request.path == '/dashboard/recep_dashboard.html' %}active{% endif %}" onclick="window.location.href='{% url 'recep_dashboard' %}'">
+  Schedule
+</button>
+
+<button class="nav-tab {% if request.path == '/dashboard/today_queue.html' %}active{% endif %}"  onclick="window.location.href='{% url 'todays_queue' %}'">
+  Queue 
+</button>
+{% endblock %}
+
 
 {% block content %}
-<div class="container">
 
-<h2>📅 Today's Appointments — {{ today }}</h2>
+<!-- ── Page Header ── -->
+<div class="pg-header">
+  <div>
+    <h1>Reception Desk 👩‍💼</h1>
+    <p>
+      {% now "l, d M Y" %} · Managing today's patient flow
+    </p>
+  </div>
+</div>
 
-<table>
-<thead>
-<tr>
-<th>Time</th>
-<th>Patient</th>
-<th>Doctor</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
+<!-- ── TODAY APPOINTMENTS ── -->
+<section>
+  <div class="sec-head">
+    Today's Appointments
+    <span>
+      {{ table_appointments|length }}
+      appointment{% if table_appointments|length != 1 %}s{% endif %}
+    </span>
+  </div>
 
-<tbody>
-{% for appt in table_appointments %}
-<tr class="{% if appt.status == 'no_show' %}no-show{% endif %}">
-<td>{{ appt.slot.start_time|date:"g:i A" }}</td>
-<td>{{ appt.patient.get_full_name }}</td>
-<td>Dr. {{ appt.doctor.get_full_name }}</td>
-<td>{{ appt.get_status_display }}</td>
+  {% if table_appointments %}
+    <div class="card-wrapper">
 
-```
-<td>
-    {% if appt.status == "confirmed" %}
-    <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="appointment_id" value="{{ appt.id }}">
-        <button name="action" value="check_in">Check-In</button>
-        <button name="action" value="no_show">No-Show</button>
-    </form>
-    {% else %}
-    —
-    {% endif %}
-</td>
-```
+      {% for appt in table_appointments %}
+      <div class="appt-card queue-card {% if appt.status == 'no_show' %}no-show{% endif %}">
+        <strong>{{ appt.patient.get_full_name }}</strong><br>
+        🕒 {{ appt.slot.start_time|date:"g:i A" }}<br>
+        👨‍⚕️ Dr. {{ appt.doctor.get_full_name }}<br>
+        <span class="status-badge status-{{ appt.status }}">
+          {{ appt.get_status_display }}
+        </span>
+        {% if appt.status == "confirmed" %}
+        <form method="POST" style="margin-top:8px;">
+          {% csrf_token %}
+          <input type="hidden" name="appointment_id" value="{{ appt.id }}">
+          <button class="btn-success" name="action" value="check_in">Check-In</button>
+          <button class="btn-danger" name="action" value="no_show">No-Show</button>
+        </form>
+        {% endif %}
+      </div>
+      {% endfor %}
 
-</tr>
-{% empty %}
-<tr>
-<td colspan="5">No appointments today</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No appointments today.</p>
+    </div>
+  {% endif %}
+
+</section>
 
 <hr style="margin:40px 0;">
 
-<h2>⏳ Check-In Queue</h2>
+<!-- ── CHECK-IN QUEUE ── -->
+<section>
+  <div class="sec-head">
+    Check-In Queue
+    <span>
+      {{ queue_appointments|length }}
+      patient{% if queue_appointments|length != 1 %}s{% endif %}
+    </span>
+  </div>
 
-<div class="queue-wrapper">
-{% for appt in queue_appointments %}
-<div class="queue-card">
-<strong>{{ appt.patient.get_full_name }}</strong><br>
-🕒 Checked in at {{ appt.check_in_at|date:"g:i A" }}<br>
-👨‍⚕️ Dr. {{ appt.doctor.get_full_name }}
-</div>
-{% empty %}
-<p>No patients in queue</p>
-{% endfor %}
-</div>
+  {% if queue_appointments %}
+    <div class="card-wrapper">
 
-</div>
+      {% for appt in queue_appointments %}
+      <div class="appt-card queue-card">
+        <strong>{{ appt.patient.get_full_name }}</strong><br>
+        🕒 Checked in at {{ appt.check_in_at|date:"g:i A" }}<br>
+        👨‍⚕️ Dr. {{ appt.doctor.get_full_name }}
+      </div>
+      {% endfor %}
+
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>No patients in queue.</p>
+    </div>
+  {% endif %}
+
+</section>
+
 
 <style>
+
+/* Wrapper for small cards */
+.card-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* Small cards */
+.appt-card.queue-card {
+  background: #eef3ff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 180px;
+  max-width: 220px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.status-confirmed { background:#e6f4ff; color:#0077cc; }
+.status-no_show { background:#ffe5e5; color:#cc0000; }
+.status-checked_in { background:#e8fff1; color:#00a86b; }
+
+/* No-show style */
 .no-show {
-background:#ffe5e5;
-text-decoration: line-through;
+  opacity: 0.6;
+  text-decoration: line-through;
 }
 
-.queue-wrapper {
-display:flex;
-gap:20px;
-flex-wrap:wrap;
+/* Buttons inside cards */
+.appt-card form {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
 }
 
-.queue-card {
-padding:15px;
-background:#eef3ff;
-border-radius:12px;
-min-width:200px;
+.btn-success {
+  background:#00a86b;
+  color:white;
+  border:none;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
 }
+
+.btn-danger {
+  background:#e74c3c;
+  color:white;
+  border:none;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.btn-success:hover,
+.btn-danger:hover {
+  opacity:0.85;
+}
+
 </style>
 
 {% endblock %}
