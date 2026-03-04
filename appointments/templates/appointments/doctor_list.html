@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Doctors · MediCare{% endblock %}
+{% block brand_url %}{% url 'patient_dashboard' %}{% endblock %}
+
+{% block content %}
+<div class="pg-header">
+    <h1>Our Doctors</h1>
+    <p>Choose a doctor to view available slots and book an appointment.</p>
+</div>
+
+{% if doctors %}
+    {% for doctor in doctors %}
+        <div class="appt-card">
+            <div class="appt-card-band">
+                <div class="appt-band-left">
+                    <div class="appt-band-title">
+                        <h3>{{ doctor.user.get_full_name }}</h3>
+                        <p>{{ doctor.specialization }}</p>
+                    </div>
+                </div>
+                <div class="band-right">
+                    <a href="{% url 'appointments:doctor_slots' doctor.id %}" class="btn btn-dark">View Slots</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-4H7v-2h4V6h2v4h4v2h-4v4z"/></svg>
+        <p>No doctors found at the moment.</p>
+        <a href="{% url 'patient_dashboard' %}">Return to Dashboard →</a>
+    </div>
+{% endif %}
+{% endblock %}

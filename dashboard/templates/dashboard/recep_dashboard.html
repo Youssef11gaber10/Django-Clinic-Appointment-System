@@ -118,7 +118,7 @@
         <span class="badge confirmed">Confirmed</span>
       {% elif app.status == "requested" %}
         <span class="badge booked">Requested</span>
-        <form method="post" action="{% url 'confirm_appointment' app.id %}" style="display:inline;">
+        <form method="post" action="{% url 'appointments:confirm_appointment' app.id %}" style="display:inline;">
           {% csrf_token %}
           <button type="submit" style="padding:4px 8px; margin-left:5px; font-size:.75rem; border-radius:8px; background:#1a6180; color:white; border:none; cursor:pointer;">Confirm</button>
         </form>

@@ -149,24 +149,58 @@ class Appointment(models.Model):
         if not new_slot.is_available:
             raise ValidationError("Selected slot is not available.")
 
+        if new_slot.doctor != self.doctor:
+            raise ValidationError("You must choose a slot for the same doctor.")
+
+        active_statuses = [
+            self.REQUESTED,
+            self.CONFIRMED,
+            self.CHECKED_IN,
+        ]
+
+        overlapping_exists = Appointment.objects.filter(
+            patient=user,
+            status__in=active_statuses,
+            slot__start_time__lt=new_slot.end_time,
+            slot__end_time__gt=new_slot.start_time,
+        ).exclude(id=self.id).exists()
+
+        if overlapping_exists:
+            raise ValidationError("You already have an overlapping appointment.")
+
+        already_booked = Appointment.objects.filter(
+            slot=new_slot,
+            status__in=active_statuses
+        ).exclude(id=self.id).exists()
+
+        if already_booked:
+            raise ValidationError("This slot is already booked.")
+
         old_start = self.slot.start_time
-        self.slot.is_available = True
-        self.slot.save()
 
-        self.slot = new_slot
-        self.status = self.REQUESTED  
-        self.save()
+        try:
+            self.slot.is_available = True
+            self.slot.save()
 
-        new_slot.is_available = False
-        new_slot.save()
+            self.slot = new_slot
+            self.status = self.REQUESTED
+            self.save()
 
-        RescheduleHistory.objects.create(
-            appointment=self,
-            old_start_datetime=old_start,
-            new_start_datetime=new_slot.start_time,
-            changed_by=user,
-            reason=reason
-        )
+            new_slot.is_available = False
+            new_slot.save()
+
+            RescheduleHistory.objects.create(
+                appointment=self,
+                old_start_datetime=old_start,
+                new_start_datetime=new_slot.start_time,
+                changed_by=user,
+                reason=reason
+            )
+
+            return self
+
+        except IntegrityError:
+            raise ValidationError("This slot has been booked by someone else.")
 
     def __str__(self):
         return f"Appointment #{self.id} - {self.patient.username}"
