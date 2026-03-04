@@ -58,7 +58,7 @@ def check_in_appointment(request, appointment_id):
         messages.success(request, "Patient checked in.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("")
+    return redirect("recep_dashboard")
 
 @login_required(login_url='login')
 @require_role('doctor')
@@ -69,7 +69,7 @@ def mark_no_show_appointment(request, appointment_id):
         messages.success(request, "Appointment marked as no-show.")
     except (ValidationError, PermissionDenied) as e:
         messages.error(request, str(e))
-    return redirect("")
+    return redirect("recep_dashboard")
 
 @login_required(login_url='login')
 @require_role('doctor')
