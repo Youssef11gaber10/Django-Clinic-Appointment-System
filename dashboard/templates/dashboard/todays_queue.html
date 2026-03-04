@@ -1,0 +1,91 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Today's Queue{% endblock %}
+
+{% block content %}
+<div class="container">
+
+<h2>📅 Today's Appointments — {{ today }}</h2>
+
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Patient</th>
+<th>Doctor</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+{% for appt in table_appointments %}
+<tr class="{% if appt.status == 'no_show' %}no-show{% endif %}">
+<td>{{ appt.slot.start_time|date:"g:i A" }}</td>
+<td>{{ appt.patient.get_full_name }}</td>
+<td>Dr. {{ appt.doctor.get_full_name }}</td>
+<td>{{ appt.get_status_display }}</td>
+
+```
+<td>
+    {% if appt.status == "confirmed" %}
+    <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="appointment_id" value="{{ appt.id }}">
+        <button name="action" value="check_in">Check-In</button>
+        <button name="action" value="no_show">No-Show</button>
+    </form>
+    {% else %}
+    —
+    {% endif %}
+</td>
+```
+
+</tr>
+{% empty %}
+<tr>
+<td colspan="5">No appointments today</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<hr style="margin:40px 0;">
+
+<h2>⏳ Check-In Queue</h2>
+
+<div class="queue-wrapper">
+{% for appt in queue_appointments %}
+<div class="queue-card">
+<strong>{{ appt.patient.get_full_name }}</strong><br>
+🕒 Checked in at {{ appt.check_in_at|date:"g:i A" }}<br>
+👨‍⚕️ Dr. {{ appt.doctor.get_full_name }}
+</div>
+{% empty %}
+<p>No patients in queue</p>
+{% endfor %}
+</div>
+
+</div>
+
+<style>
+.no-show {
+background:#ffe5e5;
+text-decoration: line-through;
+}
+
+.queue-wrapper {
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.queue-card {
+padding:15px;
+background:#eef3ff;
+border-radius:12px;
+min-width:200px;
+}
+</style>
+
+{% endblock %}
