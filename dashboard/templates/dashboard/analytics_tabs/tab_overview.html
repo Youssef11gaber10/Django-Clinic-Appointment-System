@@ -1,0 +1,53 @@
+<div id="tab-overview" class="tab-panel active">
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Doctors</div>
+      <div class="stat-value">{{ total_doctors_patients.total_doctors }}</div>
+      <div class="stat-dot" style="background:#818cf8;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Patients</div>
+      <div class="stat-value">{{ total_doctors_patients.total_patients }}</div>
+      <div class="stat-dot" style="background:#34d399;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Completed</div>
+      <div class="stat-value">{{ appointments_insights.completed_appointments }}</div>
+      <div class="stat-dot" style="background:#6abf8a;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Confirmed</div>
+      <div class="stat-value">{{ appointments_insights.confirmed_appointments }}</div>
+      <div class="stat-dot" style="background:#6a9fb5;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Checked In</div>
+      <div class="stat-value">{{ appointments_insights.checked_in_appointments }}</div>
+      <div class="stat-dot" style="background:#c8a97e;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Requested</div>
+      <div class="stat-value">{{ appointments_insights.requested_appointments }}</div>
+      <div class="stat-dot" style="background:#f0c060;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-value">{{ appointments_insights.cancelled_appointments }}</div>
+      <div class="stat-dot" style="background:#e07070;"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">No Show</div>
+      <div class="stat-value">{{ appointments_insights.no_show_appointments }}</div>
+      <div class="stat-dot" style="background:#c07070;"></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-head">Status Breakdown</div>
+    <div class="chart-wrap">
+      <canvas id="appointmentsPieChart"></canvas>
+    </div>
+  </div>
+
+</div>

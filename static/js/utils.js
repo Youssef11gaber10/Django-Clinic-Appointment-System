@@ -8,11 +8,11 @@ function switchTab(name, btn) {
   function openModal(id, name, apptId) {
     if (id === 'noShowModal') {
       document.getElementById('noshow-name').textContent = name;
-      document.getElementById('noShowForm').action = `/dashboard/appointment/${apptId}/no-show/`;
+      // document.getElementById('noShowForm').action = `/appointment/no-show/${apptId}/`;
     }
     if (id === 'declineModal') {
       document.getElementById('decline-name').textContent = name;
-      document.getElementById('declineForm').action = `/dashboard/appointment/${apptId}/decline/`;
+      // document.getElementById('declineForm').action = `/dashboard/appointment/${apptId}/decline/`;
     }
     document.getElementById(id).classList.add('open');
   }

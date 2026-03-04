@@ -1,0 +1,81 @@
+<div id="tab-reschedules" class="tab-panel">
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Reschedules</div>
+      <div class="stat-value">{{ rescheduled_appointments|length }}</div>
+      <div class="stat-dot" style="background:#a78bfa;"></div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-card-head">Reschedule History</div>
+
+    {% if rescheduled_appointments %}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Appt #</th>
+          <th>Old Date &amp; Time</th>
+          <th></th>
+          <th>New Date &amp; Time</th>
+          <th>Changed By</th>
+          <th>Reason</th>
+          <th>Logged At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in rescheduled_appointments %}
+        <tr>
+          <td><span class="appt-id-badge">{{ entry.appointment.id }}</span></td>
+
+          <td>
+            <div class="datetime-block">
+              <span class="dt-date">{{ entry.old_start_datetime|date:"M d, Y" }}</span>
+              <span class="dt-time">{{ entry.old_start_datetime|date:"g:i A" }}</span>
+            </div>
+          </td>
+
+          <td class="arrow-cell">→</td>
+
+          <td>
+            <div class="datetime-block">
+              <span class="dt-date">{{ entry.new_start_datetime|date:"M d, Y" }}</span>
+              <span class="dt-time">{{ entry.new_start_datetime|date:"g:i A" }}</span>
+            </div>
+          </td>
+
+          <td>
+            {% if entry.changed_by %}
+            <div class="changed-by-cell">
+              <div class="avatar-xs">{{ entry.changed_by.username|slice:":2" }}</div>
+              {{ entry.changed_by.username }}
+            </div>
+            {% else %}
+            <span style="color:var(--muted); font-size:.8rem;">—</span>
+            {% endif %}
+          </td>
+
+          <td>
+            <span class="reschedule-reason" title="{{ entry.reason }}">{{ entry.reason }}</span>
+          </td>
+
+          <td>
+            <div class="datetime-block">
+              <span class="dt-date">{{ entry.timestamp|date:"M d, Y" }}</span>
+              <span class="dt-time">{{ entry.timestamp|date:"g:i A" }}</span>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+      <p>No reschedule records found.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>

@@ -10,6 +10,7 @@ class Slot(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     is_available= models.BooleanField(default=True)
+    is_exception = models.BooleanField(default=False)
 
     class Meta:
         # configuration class to prevent a doctor from having 2 slots at the same time  
@@ -51,7 +52,7 @@ class DoctorException(models.Model):
     doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='exceptions')
     date = models.DateField()
     reason = models.TextField()
-    is_available = models.BooleanField(default=False)
+    is_exception = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('doctor', 'date')

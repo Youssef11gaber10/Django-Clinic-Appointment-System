@@ -124,7 +124,9 @@
               <th>Doctor</th>
               <th>Start</th>
               <th>End</th>
+              <th>Date</th>
               <th>Is available</th>
+              <th>Is exception</th>
               <th></th>
             </tr>
           </thead>
@@ -134,12 +136,15 @@
               <td>{{ s.doctor.get_full_name|default:s.doctor.username }}</td>
               <td>{{ s.start_time|time:"H:i" }}</td>
               <td>{{ s.end_time|time:"H:i" }}</td>
+              <td>{{ s.start_time|date:"d-m-Y" }}</td>
               <td>{% if s.is_available %}Yes{% else %}No{% endif %}</td>
+              <td>{% if s.is_exception %}Yes{% else %}No{% endif %}</td>
               <td>
                 <form
                   method="post"
+                  action="{% url 'scheduling:slot_delete' s.pk %}"
                   style="display: inline"
-                  onsubmit="return confirm('Delete this availability?');"
+                  onsubmit="return confirm('Delete this slot?');"
                 >
                   {% csrf_token %}
                   <button type="submit" class="btn btn-danger">Delete</button>
@@ -152,8 +157,8 @@
         {% else %}
         <div class="empty-state">
           <p>
-            No availability entries yet.
-            <a href="{% url 'scheduling:availability_add' %}">Add one</a>.
+            No slots yet.
+            <a href="{% url 'scheduling:generate_slots' %}">Add one</a>.
           </p>
         </div>
         {% endif %}

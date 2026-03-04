@@ -1,0 +1,43 @@
+<div id="tab-insights" class="tab-panel">
+  <div class="insights-grid">
+
+    {# ── Today ── #}
+    <div class="chart-card" style="margin-bottom:0;">
+      <div class="chart-card-head">Today's Appointments</div>
+      {% if daily_insights %}
+        {% for day in daily_insights %}
+          <div class="insights-section-head">{{ day.day|date:"l, M d Y" }}</div>
+          <div class="insights-row"><span class="ins-label">Total</span>      <span class="ins-val">{{ day.total_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Completed</span>  <span class="ins-val" style="color:#2e7d4f;">{{ day.completed_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Confirmed</span>  <span class="ins-val" style="color:#1a6180;">{{ day.confirmed_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Checked In</span> <span class="ins-val" style="color:#c8a97e;">{{ day.checked_in_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Requested</span>  <span class="ins-val" style="color:#8a5e00;">{{ day.requested_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Cancelled</span>  <span class="ins-val" style="color:#8a0000;">{{ day.cancelled_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">No Show</span>    <span class="ins-val" style="color:#7a2020;">{{ day.no_show_appointments }}</span></div>
+        {% endfor %}
+      {% else %}
+        <p class="no-data-inline">No appointments scheduled for today.</p>
+      {% endif %}
+    </div>
+
+    {# ── This month ── #}
+    <div class="chart-card" style="margin-bottom:0;">
+      <div class="chart-card-head">This Month's Appointments</div>
+      {% if monthly_insights %}
+        {% for month in monthly_insights %}
+          <div class="insights-section-head">{{ month.month|date:"F Y" }}</div>
+          <div class="insights-row"><span class="ins-label">Total</span>      <span class="ins-val">{{ month.total_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Completed</span>  <span class="ins-val" style="color:#2e7d4f;">{{ month.completed_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Confirmed</span>  <span class="ins-val" style="color:#1a6180;">{{ month.confirmed_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Checked In</span> <span class="ins-val" style="color:#c8a97e;">{{ month.checked_in_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Requested</span>  <span class="ins-val" style="color:#8a5e00;">{{ month.requested_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">Cancelled</span>  <span class="ins-val" style="color:#8a0000;">{{ month.cancelled_appointments }}</span></div>
+          <div class="insights-row"><span class="ins-label">No Show</span>    <span class="ins-val" style="color:#7a2020;">{{ month.no_show_appointments }}</span></div>
+        {% endfor %}
+      {% else %}
+        <p class="no-data-inline">No appointments this month yet.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

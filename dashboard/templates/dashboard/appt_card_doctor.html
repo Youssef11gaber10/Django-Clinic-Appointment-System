@@ -99,36 +99,28 @@
 
     <!-- Actions -->
     <div class="appt-actions-col">
-      {% if show_queue %}
-
         {% if appt.status == 'checked_in' %}
           <form method="POST" action="{% url 'create_consultation' appt.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-green">📝 Fill Consultation</button>
           </form>
           
-
-        {% elif appt.status == 'confirmed' %}
-          <form method="POST" action="{% url 'check_in_appointment' appt.id %}">
+          <!-- <form method="POST" action="{% url 'mark_no_show' appt.id %}">
             {% csrf_token %}
-            <button type="submit" class="btn btn-green">✓ Check In</button>
-          </form>
-          <button class="btn btn-red"
-                  onclick="openNoShow('{{ appt.id }}', '{{ appt.patient.get_full_name }}')">
+           <button class="btn btn-red">
             Mark No Show
-          </button>
+          </button>          
+        </form> -->
 
-        {% elif appt.status == 'no_show' %}
-          <span class="btn btn-ghost" style="cursor:default; opacity:.6;">No Show</span>
+ 
 
-        {% endif %}
 
-      {% else %}
-        {# completed tab — always show view record #}
-        <a href="{% url 'view_summary' appt.consultation.id %}" class="btn btn-ghost">
-          👁 View Record
-        </a>
-      {% endif %}
+          {% elif appt.status == 'completed' %}
+            <a href="{% url 'view_summary' appt.consultation.id %}" class="btn btn-ghost">
+                👁 View Record
+              </a>
+          {% endif %}
+
     </div>
 
   </div>

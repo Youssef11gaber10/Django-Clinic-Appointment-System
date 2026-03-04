@@ -10,4 +10,5 @@ urlpatterns = [
     # path('receptionist/add-availability/', recep_views.add_availability, name='add_availability'),
     # path('receptionist/generate-slots/', recep_views.generate_slots_page, name='generate_slots'),
     path('analytics/',  views.analytics, name='analytics'),
+    path("analytics/export/csv/", views.export_csv, name="export_csv"),
 ]

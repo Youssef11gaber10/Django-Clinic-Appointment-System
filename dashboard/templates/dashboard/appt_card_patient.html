@@ -94,31 +94,27 @@
       <a href="{% url 'view_summary' appt.consultation.id %}" style="text-decoration:none;" class="btn btn-dark">👁 View
         Consultation</a>
       {% else %}
-      <span class="btn btn-ghost" style="cursor:default; opacity:.6;">No Record</span>
-      {% endif %}
-      {% else %}
-      {% if appt.status == 'requested' or appt.status == 'confirmed' %}
+        {% if appt.status == 'requested' or appt.status == 'confirmed' %}
+          <form method="POST" action="{% url 'appointments:cancel_appointment' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-red"
+                    onclick="return confirm('Cancel this appointment?')">
+              ✕ Cancel
+            </button>
+          </form>
 
-      <div style="display:flex; gap:8px;">
-
-        <!-- Cancel (POST form) -->
-        <form method="POST" action="{% url 'appointments:cancel_appointment' appt.id %}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-red" onclick="return confirm('Cancel this appointment?')">
-            ✕ Cancel
-          </button>
-        </form>
-        <a href="{% url 'appointments:reschedule' appt.id %}" class="btn btn-gold"
-          style="display:flex; align-items:center; justify-content:center;">
-          🔄 Reschedule
-        </a>
-
-      </div>
-      {% else %}
-      <span class="btn btn-ghost" style="cursor:default; opacity:.6;">
-        {{ appt.get_status_display }}
-      </span>
-      {% endif %}
+           <form method="POST" action="{% url 'appointments:reschedule' appt.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-green"
+                    onclick="return confirm('Reschedule this appointment?')">
+              Reschedule
+            </button>
+          </form>
+        {% else %}
+          <span class="btn btn-ghost" style="cursor:default; opacity:.6;">
+            {{ appt.get_status_display }}
+          </span>
+        {% endif %}
       {% endif %}
     </div>
 
