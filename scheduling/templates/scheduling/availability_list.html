@@ -1,13 +1,9 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Availability list · Scheduling</title>
+{% extends "dashboard/base.html" %}
+
+  {% block extra_styles %}
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
         background: #f5f3ef;
       }
       .container {
@@ -98,8 +94,10 @@
         color: #666;
       }
     </style>
-  </head>
-  <body>
+
+    {% endblock extra_styles %}
+
+{% block content %}
     <div class="container">
       <div class="page-header">
         <h1>Availability list</h1>
@@ -168,11 +166,10 @@
         {% endif %}
       </div>
 
-      {% if request.user.role == "receptionist" %}
-    <a href="{% url 'recep_dashboard' %}" class="btn btn-dark">
-        ✅ Finish availabilities
-    </a>
-{% endif %}
+       {% if request.user.role == "receptionist" %}
+               <a href="{% url 'recep_dashboard' %}" class="btn btn-primary " style="margin-top:1.5rem;">
+               back to dashboard
+                </a>
+              {% endif %}
     </div>
-  </body>
-</html>
+{% endblock content %}

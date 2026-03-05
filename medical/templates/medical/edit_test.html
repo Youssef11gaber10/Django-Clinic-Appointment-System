@@ -1,28 +1,6 @@
-<!-- <!DOCTYPE html>
-<html>
-
-<head>
-    <title>Edit Requested Test</title>
-</head>
-
-<body>
-    <h2>Edit Requested Test</h2>
-    <form method="post"> 
-        {% csrf_token %} 
-        {{ form.as_p }} 
-        <button type="submit">Update</button></form><a
-        href="{% url 'consultation-detail' object.consultation.pk %}">Back</a>
-</body>
-
-</html> -->
-
+{% extends "dashboard/base.html" %}
+ {% block extra_styles %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Edit Requested Test · MediCare</title>
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -44,7 +22,6 @@
 body{
     font-family:'DM Sans',sans-serif;
     background:var(--bg);
-    padding:2.5rem;
     color:var(--text);
 }
 
@@ -134,9 +111,9 @@ textarea[readonly]{
     align-items:center;
 }
 </style>
-</head>
+    {% endblock extra_styles %}
 
-<body>
+{% block content %}
 
 <div class="header">
     <h1>Edit Requested Test</h1>
@@ -167,5 +144,4 @@ textarea[readonly]{
     </form>
 </div>
 
-</body>
-</html>
+{% endblock content %}

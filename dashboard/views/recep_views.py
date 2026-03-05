@@ -48,11 +48,52 @@ def recep_dashboard(request):
 
 
 
+# @login_required
+# @require_role('receptionist')
+# def todays_queue(request):
+
+#     today = timezone.localdate()
+
+#     if request.method == "POST":
+#         appointment_id = request.POST.get("appointment_id")
+#         action = request.POST.get("action")
+
+#         appointment = get_object_or_404(Appointment, id=appointment_id)
+
+#         if action == "check_in":
+#             appointment.check_in_appointment(request.user)
+
+#         elif action == "no_show":
+#             appointment.mark_no_show(request.user)
+
+#         return redirect("todays_queue")
+
+#     appointments = Appointment.objects.filter(
+#         slot__start_time__date=today,
+#         status__in=["confirmed", "checked_in", "no_show"]
+#     ).select_related("patient", "doctor", "slot").order_by("slot__start_time")
+
+#     table_appointments = appointments.exclude(status="checked_in")
+
+#     queue_appointments = appointments.filter(
+#         status="checked_in"
+#     ).order_by("check_in_at")
+
+#     context = {
+#         "table_appointments": table_appointments,
+#         "queue_appointments": queue_appointments,
+#         "today": today,
+#     }
+
+#     return render(request, "dashboard/todays_queue.html", context)
+
+
 @login_required
 @require_role('receptionist')
 def todays_queue(request):
 
     today = timezone.localdate()
+    search_query = request.GET.get("q", "")
 
     if request.method == "POST":
         appointment_id = request.POST.get("appointment_id")
@@ -71,7 +112,17 @@ def todays_queue(request):
     appointments = Appointment.objects.filter(
         slot__start_time__date=today,
         status__in=["confirmed", "checked_in", "no_show"]
-    ).select_related("patient", "doctor", "slot").order_by("slot__start_time")
+    ).select_related("patient", "doctor", "slot")
+
+    # 🔎 search filter
+    if search_query:
+        appointments = appointments.filter(
+            patient__first_name__icontains=search_query
+        ) | appointments.filter(
+            patient__last_name__icontains=search_query
+        )
+
+    appointments = appointments.order_by("slot__start_time")
 
     table_appointments = appointments.exclude(status="checked_in")
 
@@ -83,9 +134,11 @@ def todays_queue(request):
         "table_appointments": table_appointments,
         "queue_appointments": queue_appointments,
         "today": today,
+        "search_query": search_query
     }
 
     return render(request, "dashboard/todays_queue.html", context)
+
     
 
 

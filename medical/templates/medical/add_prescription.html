@@ -1,27 +1,5 @@
-<!-- <!DOCTYPE html>
-<html>
-
-<head>
-    <title>Create Prescription</title>
-</head>
-
-<body>
-    <h2>Create Prescription</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-    <a href="javascript:history.back()">Back</a>
-</body>
-
-</html> -->
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Create Prescription · MediCare</title>
+{% extends "dashboard/base.html" %}
+{% block extra_styles %}
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -44,7 +22,6 @@
 body{
     font-family:'DM Sans',sans-serif;
     background:var(--bg);
-    padding:2.5rem;
     color:var(--text);
 }
 
@@ -134,9 +111,9 @@ textarea[readonly]{
     align-items:center;
 }
 </style>
-</head>
+    {% endblock extra_styles %}
 
-<body>
+{% block content %}
 
 <div class="header">
     <h1>Create Prescription</h1>
@@ -167,5 +144,4 @@ textarea[readonly]{
     </form>
 </div>
 
-</body>
-</html>
+{% endblock content %}

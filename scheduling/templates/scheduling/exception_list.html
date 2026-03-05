@@ -1,13 +1,10 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exception list · Scheduling</title>
+
+{% extends "dashboard/base.html" %}
+
+  {% block extra_styles %}
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
         background: #f5f3ef;
       }
       .container {
@@ -98,15 +95,22 @@
         color: #666;
       }
     </style>
-  </head>
-  <body>
+{% endblock extra_styles %}
+
+{% block content %}
     <div class="container">
       <div class="page-header">
         <h1>Exception list</h1>
         <a href="{% url 'scheduling:exception_add' %}" class="btn btn-primary"
-          >Add exception</a
-        >
+          >Add exception</a>
+
+             {% if request.user.role == "receptionist" %}
+               <a href="{% url 'recep_dashboard' %}" class="btn btn-dark " style="margin-top:1rem;">
+               back to dashboard
+                </a>
+       {% endif %}
       </div>
+
 
       {% if messages %}
       <div class="messages">
@@ -157,6 +161,9 @@
         </div>
         {% endif %}
       </div>
+
+
+      
     </div>
-  </body>
-</html>
+
+{% endblock content %}

@@ -1,10 +1,6 @@
+{% extends "dashboard/base.html" %}
+ {% block extra_styles %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Consultation Summary · MediCare</title>
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -25,7 +21,6 @@
     body{
         font-family:'DM Sans',sans-serif;
         background:var(--bg);
-        padding:2.5rem;
         color:var(--text);
     }
 
@@ -103,15 +98,18 @@
     }
 
     .btn{
-        padding:7px 16px;
-        border-radius:8px;
-        font-size:.8rem;
-        border:none;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-block;
-        transition:.15s;
-        margin-top:10px;
+          padding:7px 16px;
+    border-radius:8px;
+    font-size:.8rem;
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:fit-content;
+    transition:.15s;
+    margin-top:10px;
     }
 
     .btn-dark{
@@ -127,10 +125,9 @@
     }
 
 </style>
-</head>
+    {% endblock extra_styles %}
 
-<body>
-
+{% block content %}
 <div class="header">
     <h1>Consultation Summary</h1>
 
@@ -232,9 +229,8 @@
 
 {% if request.user.role == "doctor" %}
     <a href="{% url 'appointments:complete_appointment' object.appointment.id %}" class="btn btn-dark">
-        ✅ Finish Consultation
+        Finish Consultation
     </a>
 {% endif %}
 
-</body>
-</html>
+{% endblock content %}

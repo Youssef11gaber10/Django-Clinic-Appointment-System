@@ -4,7 +4,6 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
         background: #f5f3ef;
       }
       .container {
@@ -131,8 +130,21 @@
           {% if form.non_field_errors %}
           <div class="message-error">{{ form.non_field_errors.0 }}</div>
           {% endif %}
+
         </form>
+
+         {% if request.user.role == "receptionist" %}
+               <a href="{% url 'recep_dashboard' %}" class="btn btn-dark " style="margin-top:1.5rem;">
+               back to dashboard
+                </a>
+              {% endif %}
+
+        
       </div>
+      
+    
     </div>
+    
+
     {% endblock content %}
   </body>

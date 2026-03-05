@@ -1,16 +1,11 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {% if title %}{{ title }}{% else %}Add Exception{% endif %} · Doctor
-      Exceptions
-    </title>
+
+{% extends "dashboard/base.html" %}
+ 
+    {% block extra_styles %}
+
     <style>
       body {
         font-family: Arial, sans-serif;
-        margin: 20px;
         background: #f5f3ef;
       }
       .container {
@@ -102,8 +97,9 @@
         font-size: 0.9rem;
       }
     </style>
-  </head>
-  <body>
+    {% endblock extra_styles %}
+
+   {% block content %}
     <div class="container">
       <div class="back-link"></div>
       <div class="page-header">
@@ -137,7 +133,12 @@
           <div class="message-error">{{ form.non_field_errors.0 }}</div>
           {% endif %}
         </form>
+
+            {% if request.user.role == "receptionist" %}
+               <a href="{% url 'recep_dashboard' %}" class="btn btn-primary" style="margin-top:1.5rem;">
+               back to dashboard
+                </a>
+        {% endif %}
       </div>
     </div>
-  </body>
-</html>
+    {% endblock content %}

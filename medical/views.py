@@ -205,7 +205,7 @@ def edit_test(request, pk):
     else:
         form = RequestedTestForm(instance=test)
 
-    return render(request, "medical/test_edit.html", {"form": form,"object":test})
+    return render(request, "medical/edit_test.html", {"form": form,"object":test})
 
 
 

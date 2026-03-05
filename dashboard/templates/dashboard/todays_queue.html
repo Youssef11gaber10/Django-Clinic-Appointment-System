@@ -19,11 +19,24 @@
 <!-- ── Page Header ── -->
 <div class="pg-header">
   <div>
-    <h1>Reception Desk 👩‍💼</h1>
+    <h1>today's queue 👩‍💼</h1>
     <p>
       {% now "l, d M Y" %} · Managing today's patient flow
     </p>
   </div>
+</div>
+
+<!-- 🔎 Search Bar -->
+<div class="search-bar">
+  <form method="GET">
+    <input 
+      type="text" 
+      name="q" 
+      placeholder="Search patient name..." 
+      value="{{ search_query }}"
+    >
+    <button type="submit">Search</button>
+  </form>
 </div>
 
 <!-- ── TODAY APPOINTMENTS ── -->
@@ -173,6 +186,35 @@
 .btn-success:hover,
 .btn-danger:hover {
   opacity:0.85;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-bar form {
+  display: flex;
+  gap: 8px;
+}
+
+.search-bar input {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 220px;
+}
+
+.search-bar button {
+  background: #0077cc;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  opacity: 0.9;
 }
 
 </style>

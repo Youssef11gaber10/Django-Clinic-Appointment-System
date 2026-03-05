@@ -1,23 +1,7 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Consultation</title>
-</head>
-<body>
-<h2>Edit Consultation</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">update</button>
-</form>
-<a href="{% url 'consultation_detail' object.pk %}">Back</a></html> -->
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Edit Consultation · MediCare</title>
 
+{% extends "dashboard/base.html" %}
+
+{% block extra_styles %}
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
@@ -39,7 +23,6 @@
 body{
     font-family:'DM Sans',sans-serif;
     background:var(--bg);
-    padding:2.5rem;
     color:var(--text);
 }
 
@@ -129,10 +112,9 @@ textarea[readonly]{
     align-items:center;
 }
 </style>
-</head>
+    {% endblock extra_styles %}
 
-<body>
-
+{% block content %}
 <div class="header">
     <h1>Edit Consultation</h1>
     {% if request.user.role == "doctor" %}
@@ -161,6 +143,4 @@ textarea[readonly]{
         </div>
     </form>
 </div>
-
-</body>
-</html>
+{% endblock content %}

@@ -1,9 +1,6 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Availability list · Scheduling</title>
+{% extends "dashboard/base.html" %}
+    {% block extra_styles %}
+
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -98,8 +95,10 @@
         color: #666;
       }
     </style>
-  </head>
-  <body>
+
+  {% endblock extra_styles %}
+
+  {% block content %}
     <div class="container">
       <div class="page-header">
         <h1>slot list</h1>
@@ -164,5 +163,4 @@
         {% endif %}
       </div>
     </div>
-  </body>
-</html>
+  {% endblock content %}
