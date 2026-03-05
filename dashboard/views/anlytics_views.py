@@ -154,35 +154,17 @@ def export_csv(request):
     writer.writerow([""])
     writer.writerow(["Daily Insights"])
     daily_insights = all_analytics["daily_insights"]
-    writer.writerow(["Day", "Total Appointments", "Completed Appointments", "Cancelled Appointments", "No Show Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"])
-    for insight in daily_insights:
-        writer.writerow([
-            insight["day"].strftime("%Y %B %d"),
-            insight["total_appointments"],
-            insight["completed_appointments"],
-            insight["cancelled_appointments"],
-            insight["no_show_appointments"],
-            insight["requested_appointments"],
-            insight["confirmed_appointments"],
-            insight["checked_in_appointments"],
-    ])
+    daily_isnights_header = ["Day", "Total_Appointments", "Completed_Appointments", "Cancelled_Appointments", "No _Show_Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"]
+    for rowKey, key in  zip(daily_isnights_header, daily_insights[0].keys()):
+        writer.writerow([ rowKey , daily_insights[0][key]])
 
     writer.writerow([""])
     writer.writerow(["Monthly Insights"])
     monthly_insights = all_analytics["monthly_insights"]
-    writer.writerow(["Month", "Total Appointments", "Completed Appointments", "Cancelled Appointments", "No Show Appointments", "Requested Appointments", "Confirmed Appointments", "Checked In Appointments"])
-    print(monthly_insights)
-    for insight in monthly_insights:
-        writer.writerow([
-            insight["month"].strftime("%Y %B"),
-            insight["total_appointments"],
-            insight["completed_appointments"],
-            insight["cancelled_appointments"],
-            insight["no_show_appointments"],
-            insight["requested_appointments"],
-            insight["confirmed_appointments"],
-            insight["checked_in_appointments"],
-        ])
+    monthly_insights_header = daily_isnights_header
+    monthly_insights_header[0] = "Month"
+    for rowKey, key in  zip(monthly_insights_header, monthly_insights[0].keys()):
+        writer.writerow([ rowKey , key == "month" and monthly_insights[0][key].strftime("%Y %B") or monthly_insights[0][key]])
 
     writer.writerow([""])
     writer.writerow(["Rescheduled Appointments"])

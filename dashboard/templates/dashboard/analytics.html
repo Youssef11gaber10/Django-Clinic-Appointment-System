@@ -8,10 +8,11 @@
   <link rel="stylesheet" href="{% static 'css/analytics.css' %}">
 {% endblock %}
 
+
 {% block nav_tabs %}
   <button class="nav-tab active" onclick="switchTab('overview', this)">Overview</button>
   <button class="nav-tab" onclick="switchTab('doctors', this)">
-    By Doctor <span class="tab-count">{{ doctors_insights|length }}</span>
+    Doctors Insights <span class="tab-count">{{ doctors_insights|length }}</span>
   </button>
   <button class="nav-tab" onclick="switchTab('reschedules', this)">
     Reschedules <span class="tab-count">{{ rescheduled_appointments|length }}</span>
