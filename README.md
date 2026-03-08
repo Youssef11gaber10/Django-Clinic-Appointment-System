@@ -3,6 +3,9 @@
 
 A comprehensive web-based clinic management system built with Django, designed to streamline appointment scheduling, patient management, medical records, and administrative tasks for healthcare facilities.
 
+## Project Demo
+https://youtu.be/Am3kR5aX9y4
+
 ## Features
 
 ### User Management
